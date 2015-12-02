@@ -1,5 +1,6 @@
 package master;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -7,8 +8,11 @@ import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public abstract class JsonTweetProvider implements TweetProvider {
+public abstract class JsonStreamTweetProvider implements TweetProvider {
 	
+	protected abstract BufferedReader getReader();
+
+
 	/**
 	 * 
 	 * @param jsonStr
@@ -34,6 +38,28 @@ public abstract class JsonTweetProvider implements TweetProvider {
 			
 		return null;
 		
+	}
+	
+	public Tweet getNextTweet() {
+		
+		try {
+			String jsonLine;
+			Tweet tweet;
+			BufferedReader reader = this.getReader();
+			
+			while((jsonLine = reader.readLine()) != null) {
+				tweet = this.getTweetFromJson(jsonLine);
+				
+				if(tweet != null) {
+					return tweet;
+				}
+			}
+			
+		} catch (IOException e) {
+			e.printStackTrace();			
+		}
+		
+		return null;
 	}
 
 }
