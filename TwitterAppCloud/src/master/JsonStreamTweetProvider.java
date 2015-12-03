@@ -33,7 +33,9 @@ public abstract class JsonStreamTweetProvider implements TweetProvider {
 				hashtags.add(hashtag.get("text").asText());
 			}
 			
-			return new Tweet(createdAt, hashtags);
+			String language = json.get("lang").asText();
+			
+			return new Tweet(createdAt, hashtags, language);
 		}
 			
 		return null;

@@ -6,11 +6,12 @@ public class Tweet {
 	
 	private String created_at;
 	private List<String> hashtags;
-	
-	
-	public Tweet(String created_at, List<String> hashtags) {
+	private String language;
+
+	public Tweet(String created_at, List<String> hashtags, String language) {
 		this.created_at = created_at;
 		this.hashtags = hashtags;
+		this.language = language;
 	}
 	
 	public String getCreated_at() {
@@ -27,6 +28,14 @@ public class Tweet {
 	
 	public void setHashtags(List<String> hashtags) {
 		this.hashtags = hashtags;
+	}
+	
+	public String getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(String language) {
+		this.language = language;
 	}
 	
 	@Override
