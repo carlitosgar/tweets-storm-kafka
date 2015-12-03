@@ -26,7 +26,7 @@ public abstract class JsonStreamTweetProvider implements TweetProvider {
 		
 		if(json.has("created_at")) {
 			
-			String createdAt = json.get("created_at").asText();
+			String createdAt = json.get("timestamp_ms").asText();
 			
 			List<String> hashtags = new LinkedList<String>();
 			for(JsonNode hashtag : json.get("entities").get("hashtags")) {
