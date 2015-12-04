@@ -21,5 +21,17 @@ public class HashtagRankEntry implements Comparable<HashtagRankEntry>{
 			return this.hashtag.compareTo(o.hashtag);
 		}
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		
+		if(!obj.getClass().equals(this.getClass())) {
+			return false;
+		}
+		
+		HashtagRankEntry o = (HashtagRankEntry) obj;
+		
+		return this.language.equals(o.language) && this.hashtag.equals(o.hashtag) && this.count == o.count;
+	}
 
 }

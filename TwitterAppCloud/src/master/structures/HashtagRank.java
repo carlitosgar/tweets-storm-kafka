@@ -5,17 +5,18 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-public class FinalRank {
+public class HashtagRank {
 	
 	private HashMap<String, HashtagRankEntry> hashMap;
 
-	public FinalRank() {
+	public HashtagRank() {
 		
 		this.hashMap = new HashMap<String, HashtagRankEntry>();
 	}
 	
 	/**
 	 * Adds an entry. Is the entry already exists, increments its count.
+	 * Carefull, it modifies the entries!!
 	 * @param entry
 	 */
 	public void add(HashtagRankEntry entry) {
@@ -38,7 +39,7 @@ public class FinalRank {
 		List<HashtagRankEntry> entries = new LinkedList<HashtagRankEntry>(this.hashMap.values());
 		
 		// Sort the entries
-		Collections.sort(entries);
+		Collections.sort(entries, Collections.reverseOrder());
 		
 		// Return the top n elements
 		return entries.subList(0, n);
