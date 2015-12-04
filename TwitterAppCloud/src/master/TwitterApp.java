@@ -3,6 +3,8 @@ package master;
 import java.io.File;
 import java.io.FileNotFoundException;
 
+import org.apache.kafka.clients.producer.ProducerRecord;
+
 public class TwitterApp {
 
 	public static void main(String[] args) {
@@ -37,11 +39,14 @@ public class TwitterApp {
 		}
 		
 		Tweet tweet;
+		// Hardcoded for local testing in my machine.
+		TweetKafkaProducer producer = new TweetKafkaProducer("twitterStream","localhost:9092");
 		
 		while((tweet = provider.getNextTweet()) != null) {
 			System.out.println(tweet);
+			producer.publishMsg(tweet);
 		}
-		
+		producer.close();
 		
 	}
 
