@@ -30,9 +30,9 @@ public class HashtagRank {
 	}
 	
 	/**
-	 * Gets a list with the top n elements.
-	 * @param n
-	 * @return
+	 * Gets an ordered list with the top n elements.
+	 * @param n Maximum of top elements to return. If n >= size, then all the elements will be returned.
+	 * @return Ordered list with the top n elements
 	 */
 	public List<HashtagRankEntry> getBestN(int n) {
 		
@@ -42,8 +42,12 @@ public class HashtagRank {
 		Collections.sort(entries, Collections.reverseOrder());
 		
 		// Return the top n elements
-		return entries.subList(0, n);
+		return entries.subList(0, (n < this.size() ? n : this.size()));
 		
+	}
+	
+	public int size() {
+		return this.hashMap.size();
 	}
 	
 	

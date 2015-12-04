@@ -47,6 +47,20 @@ public class HastagRankTest {
 		assertTrue(bests.get(0).equals(new HashtagRankEntry("es", "hashtag4", 22)));
 		assertTrue(bests.get(1).equals(new HashtagRankEntry("es", "hashtag3", 21)));
 	}
+	
+	@Test
+	public void RequestMoreThanSize() {
+		
+		HashtagRank rank = new HashtagRank();
+		rank.add(entry3);
+		rank.add(entry2);
+		rank.add(entry1);
+		rank.add(entry0);
+		
+		List<HashtagRankEntry> bests = rank.getBestN(5);
+		
+		assertEquals(4, bests.size());
+	}
 
 	@Test
 	public void AddAlreadyOrderedAndUnique() {
