@@ -1,5 +1,8 @@
 package master;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -10,13 +13,15 @@ public class TweetKafkaProducer{
 	private final Properties props = new Properties();
 	private static KafkaProducer<String, String> producer;
 	
-	public TweetKafkaProducer (String topic, String broker){
+	public TweetKafkaProducer (String topic){
 		this.topic = topic;
-		this.props.put("bootstrap.servers", broker);
-		this.props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-		this.props.put("value.serializer","org.apache.kafka.common.serialization.StringSerializer");
-		this.props.put("partitioner.class", "master.LangPartitioner");
-		this.props.put("request.required.acks", "1");
+		InputStream in = null;
+		try {
+			in = new FileInputStream("src/master/producer.properties");
+			this.props.load(in);
+		} catch(IOException e){
+			System.out.println(e.toString());
+		}
 		producer = new KafkaProducer<String, String>(props);
 	}
 	

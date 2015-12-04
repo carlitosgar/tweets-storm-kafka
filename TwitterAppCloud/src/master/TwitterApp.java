@@ -40,7 +40,7 @@ public class TwitterApp {
 		
 		Tweet tweet;
 		// Hardcoded for local testing in my machine.
-		TweetKafkaProducer producer = new TweetKafkaProducer("twitterStream","localhost:9092");
+		TweetKafkaProducer producer = new TweetKafkaProducer("twitterStream");
 		
 		while((tweet = provider.getNextTweet()) != null) {
 			System.out.println(tweet);
