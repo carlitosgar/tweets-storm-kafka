@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 import org.apache.kafka.clients.producer.ProducerRecord;
+
+import master.structures.Tweet;
+
 import org.apache.kafka.clients.producer.KafkaProducer;
 
 public class TweetKafkaProducer{

@@ -8,6 +8,8 @@ import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import master.structures.Tweet;
+
 public abstract class JsonStreamTweetProvider implements TweetProvider {
 	
 	protected abstract BufferedReader getReader();

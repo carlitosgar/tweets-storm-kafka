@@ -1,4 +1,4 @@
-package master;
+package master.structures;
 
 import java.util.List;
 

@@ -1,5 +1,7 @@
 package master;
 
+import master.structures.Tweet;
+
 public interface TweetProvider {
 	
 	/**

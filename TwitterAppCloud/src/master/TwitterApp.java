@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 
 import org.apache.kafka.clients.producer.ProducerRecord;
 
+import master.structures.Tweet;
+
 public class TwitterApp {
 
 	public static void main(String[] args) {
