@@ -1,9 +1,11 @@
-package master2015.structures;
+package master2015.structures.tuple;
 
 import java.util.List;
 
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
+import master2015.structures.HashtagRankEntry;
+import master2015.structures.TimeWindow;
 
 public class SubRankTupleValues extends Values {
 

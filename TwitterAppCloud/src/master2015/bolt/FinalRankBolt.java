@@ -10,14 +10,19 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
+import master2015.Top3App;
 import master2015.structures.HashtagRank;
 import master2015.structures.HashtagRankEntry;
-import master2015.structures.SubRankTupleValues;
 import master2015.structures.TimeWindow;
+import master2015.structures.tuple.RankTupleValues;
+import master2015.structures.tuple.SubRankTupleValues;
+import master2015.structures.tuple.TotalTupleValues;
 
 public class FinalRankBolt extends BaseRichBolt {
 
 	private static final long serialVersionUID = -2801948582197519691L;
+	
+	private OutputCollector collector;
 	
 	/**
 	 * SortedMap that contains timeWindows as keys, and the total of tweets in that time window as values.
@@ -44,15 +49,32 @@ public class FinalRankBolt extends BaseRichBolt {
 	@Override
 	public void execute(Tuple input) {
 		
-		//TODO: process totals tuples
-		//processTotalTuple(Tuple input);
+		switch(input.getSourceStreamId()) {
 		
-		processSubRankTuple(input);
+		case Top3App.STREAM_TOTALS_SPOUT_TO_RANK:
+			processTotalTuple(input);
+			break;
+			
+		case Top3App.STREAM_SUBRANK_TO_RANK:
+			processSubRankTuple(input);
+			break;
+			
+		default:
+			System.err.println("Unknown tuple");
+			break;
+		
+		}
 
 	}
 	
 	private void processTotalTuple(Tuple input) {
-		// TODO
+		
+		TotalTupleValues tupleVals = TotalTupleValues.fromTuple(input);
+		
+		if(tupleVals != null) {
+			totals.put(tupleVals.getTimeWindow(), tupleVals.getTotal());
+		}
+		
 	}
 	
 	private void processSubRankTuple(Tuple input) {
@@ -106,7 +128,8 @@ public class FinalRankBolt extends BaseRichBolt {
 	
 	private void finalizeTimeWindow(TimeWindow timeWindow, HashtagRank rank) {
 		
-		// TODO: log
+		// Emit to logers
+		this.collector.emit(new RankTupleValues(timeWindow, rank.getBestN(Top3App.RANK_NUMBER)));
 		
 		// Clean all the data that does not need to be stored after logging
 		this.counts.remove(timeWindow);
@@ -115,16 +138,17 @@ public class FinalRankBolt extends BaseRichBolt {
 		
 	}
 
+	
 	@Override
+	@SuppressWarnings("rawtypes")
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
-		// TODO Auto-generated method stub
+		this.collector = collector;
 
 	}
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		// TODO Auto-generated method stub
-
+		declarer.declareStream(Top3App.STREAM_RANK_TO_LOGERS, RankTupleValues.getFields());
 	}
 
 }
