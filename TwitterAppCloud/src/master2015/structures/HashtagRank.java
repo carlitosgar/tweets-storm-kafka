@@ -1,4 +1,4 @@
-package master.structures;
+package master2015.structures;
 
 import java.util.Collections;
 import java.util.HashMap;

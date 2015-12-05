@@ -1,4 +1,4 @@
-package master.structures;
+package master2015.structures;
 
 public class HashtagRankEntry implements Comparable<HashtagRankEntry>{
 	

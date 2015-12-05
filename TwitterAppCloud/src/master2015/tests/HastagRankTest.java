@@ -1,4 +1,4 @@
-package master.tests;
+package master2015.tests;
 
 import static org.junit.Assert.*;
 
@@ -7,8 +7,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import master.structures.HashtagRank;
-import master.structures.HashtagRankEntry;
+import master2015.structures.HashtagRank;
+import master2015.structures.HashtagRankEntry;
 
 public class HastagRankTest {
 	
