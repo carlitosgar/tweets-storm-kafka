@@ -46,6 +46,14 @@ public class HashtagRank {
 		
 	}
 	
+	/**
+	 * Gets an ordered list with all the elements.
+	 * @return
+	 */
+	public List<HashtagRankEntry> getAll() {
+		return this.getBestN(this.size());
+	}
+	
 	public int size() {
 		return this.hashMap.size();
 	}
