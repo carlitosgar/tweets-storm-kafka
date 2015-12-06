@@ -3,24 +3,24 @@ package master2015.structures;
 public class TimeWindow implements Comparable<TimeWindow> {
 
 	private String language;
-	private Long timeWindow;
+	private Long timestamp;
 	
-	public TimeWindow(String language, Long timeWindow) {
+	public TimeWindow(String language, Long timestamp) {
 		this.language = language;
-		this.timeWindow = timeWindow;
+		this.timestamp = timestamp;
 	}
 	
 	public String getLanguage() {
 		return language;
 	}
 
-	public Long getTimeWindow() {
-		return timeWindow;
+	public Long getTimestamp() {
+		return timestamp;
 	}
 
 	@Override
 	public int compareTo(TimeWindow o) {
-		return this.timeWindow.compareTo(o.getTimeWindow());
+		return this.timestamp.compareTo(o.getTimestamp());
 	}
 	
 	@Override
@@ -32,7 +32,7 @@ public class TimeWindow implements Comparable<TimeWindow> {
 		
 		TimeWindow o = (TimeWindow) obj;
 		
-		return this.language.equals(o.getLanguage()) && this.timeWindow.equals(o.getTimeWindow());
+		return this.language.equals(o.getLanguage()) && this.timestamp.equals(o.getTimestamp());
 	}
 
 }
