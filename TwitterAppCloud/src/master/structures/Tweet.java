@@ -8,6 +8,10 @@ public class Tweet {
 	private List<String> hashtags;
 	private String language;
 
+	public Tweet(){
+		/*Dummy constructor for serialization/deserialization with jackson*/
+	}
+	
 	public Tweet(String timestamp, List<String> hashtags, String language) {
 		this.timestamp = new Long(timestamp);
 		this.hashtags = hashtags;
@@ -18,9 +22,9 @@ public class Tweet {
 		return timestamp;
 	}
 	
-	public void setTimestamp(String timestamp) {
+	/*public void setTimestamp(String timestamp) {
 		this.timestamp = new Long(timestamp);
-	}
+	}*/
 	
 	public void setTimestamp(Long timestamp) {
 		this.timestamp = timestamp;
