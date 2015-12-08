@@ -5,10 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 import org.apache.kafka.clients.producer.ProducerRecord;
-
 import kafka.serializer.Encoder;
 import master.structures.Tweet;
-
 import org.apache.kafka.clients.producer.KafkaProducer;
 
 public class TweetKafkaProducer{
@@ -49,7 +47,7 @@ public class TweetKafkaProducer{
 		if(ts >= currentTs){ // Discard if doesen't belong to current window.
 			tweet.setTimestamp(ts);
 			bytesTweet = tweetEncoder.toBytes(tweet);
-			msg = new ProducerRecord<String, byte[]>(this.topic,bytesTweet);
+			msg = new ProducerRecord<String, byte[]>(this.topic,tweet.getLanguage(),bytesTweet);
 			producer.send(msg);
 			currentTs = ts;
 		}

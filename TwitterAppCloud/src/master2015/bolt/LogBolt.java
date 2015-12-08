@@ -1,4 +1,4 @@
-package master2015.spout;
+package master2015.bolt;
 
 import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,6 +11,11 @@ import backtype.storm.tuple.Tuple;
 public class LogBolt implements IBasicBolt{
 
 	private static final ObjectMapper objectMapper = new ObjectMapper();
+	private String logID;
+	
+	public LogBolt(String id){
+		this.logID = id;
+	}
 	
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer arg0) {		
@@ -27,11 +32,12 @@ public class LogBolt implements IBasicBolt{
 
 	@Override
 	public void execute(Tuple tuple, BasicOutputCollector collector) {
-		System.out.println("Values: " + tuple.getValues() + ", Fields: "+tuple.getFields());
+		System.out.println("Values: " + tuple.getValues() + " - Fields: "+tuple.getFields() 
+		+ " - ID: "+this.logID);
 	}
 
 	@Override
-	public void prepare(Map arg0, TopologyContext arg1) {		
+	public void prepare(Map map, TopologyContext ctx) {
 	}
 
 }

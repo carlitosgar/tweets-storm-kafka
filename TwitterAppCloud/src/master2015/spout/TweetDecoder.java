@@ -27,7 +27,7 @@ public class TweetDecoder implements Scheme {
 
 	@Override
 	public Fields getOutputFields() {
-		return new Fields("language","hashtag","timestamp");
+		return new Fields("language","hashtags","timestamp");
 	}
 
 }
