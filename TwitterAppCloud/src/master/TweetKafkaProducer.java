@@ -11,15 +11,15 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 
 public class TweetKafkaProducer{
 	
-	private static final int SIZE = 500; //Hardcoded size for testing.
-	private static final int ADVANCE = 3; //Hardcoded advance for testing.
+	/*private static final int SIZE = 500; //Hardcoded size for testing.
+	private static final int ADVANCE = 3; //Hardcoded advance for testing.*/
 	
 	private final String topic;
 	private final Properties props = new Properties();
-	private static int window = 0;
+	/*private static int window = 0;
 	private static int lowWindowTs = -1;
 	private static int topWindowTs = -1;
-	private static Long currentTs = 0L;
+	private static Long currentTs = 0L;*/
 	private static Encoder<Tweet> tweetEncoder = new TweetEncoder(null);
 	private static KafkaProducer<String, byte[]> producer;
 	
@@ -43,14 +43,14 @@ public class TweetKafkaProducer{
 	public void publishMsg(Tweet tweet){
 		ProducerRecord<String, byte[]> msg;
 		byte[] bytesTweet;
-		Long ts = this.tweetTimeStamp(tweet.getTimestamp());
-		if(ts >= currentTs){ // Discard if doesen't belong to current window.
-			tweet.setTimestamp(ts);
+		//Long ts = this.tweetTimeStamp(tweet.getTimestamp());
+		//if(ts >= currentTs){ // Discard if doesen't belong to current window.
+			//tweet.setTimestamp(ts);
 			bytesTweet = tweetEncoder.toBytes(tweet);
 			msg = new ProducerRecord<String, byte[]>(this.topic,tweet.getLanguage(),bytesTweet);
 			producer.send(msg);
-			currentTs = ts;
-		}
+			//currentTs = ts;
+		//}
 	}
 	
 	/**
@@ -59,7 +59,7 @@ public class TweetKafkaProducer{
 	 * @return windowTimeStamp
 	 */
 	private Long tweetTimeStamp(Long ts){
-		int tsInSec = (int) (ts / 1000);
+		/*int tsInSec = (int) (ts / 1000);
 		int bucket;
 		if (lowWindowTs < 0){
 			lowWindowTs = tsInSec;
@@ -70,7 +70,8 @@ public class TweetKafkaProducer{
 			window++;
 		}
 		bucket = (tsInSec - lowWindowTs) % SIZE;
-		return (long) window * SIZE + bucket;
+		return (long) window * SIZE + bucket;*/
+		return 0L;
 	}
 	
 	public void close(){

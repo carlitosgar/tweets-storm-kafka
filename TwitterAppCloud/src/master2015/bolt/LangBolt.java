@@ -9,6 +9,8 @@ import backtype.storm.tuple.Tuple;
 
 public class LangBolt extends BaseBasicBolt{
 	
+	private static final long serialVersionUID = 9129598163544824838L;
+	
 	/**
 	 * List of languages that define the different streams that generates
 	 * this bolt.

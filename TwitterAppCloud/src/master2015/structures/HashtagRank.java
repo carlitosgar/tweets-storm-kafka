@@ -10,7 +10,6 @@ public class HashtagRank {
 	private HashMap<String, HashtagRankEntry> hashMap;
 
 	public HashtagRank() {
-		
 		this.hashMap = new HashMap<String, HashtagRankEntry>();
 	}
 	
@@ -20,7 +19,6 @@ public class HashtagRank {
 	 * @param entry
 	 */
 	public void add(HashtagRankEntry entry) {
-		
 		HashtagRankEntry previous = this.hashMap.put(entry.hashtag, entry);
 		
 		if(previous != null) {
