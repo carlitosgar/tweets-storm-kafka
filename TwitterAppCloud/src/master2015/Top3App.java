@@ -7,6 +7,7 @@ import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
+import master2015.bolt.FinalRankBolt;
 import master2015.bolt.HashtagSplitBolt;
 import master2015.bolt.LangBolt;
 import master2015.bolt.LogBolt;
@@ -18,11 +19,15 @@ public class Top3App {
 	
 	public static final int RANK_NUMBER = 3;
 	
-	public static final String STREAM_TWEETS_SPOUT = "tweets";
-	public static final String STREAM_LANG_MAPPER_BOLT = "langMapper";
+	public static final String TWEETS_SPOUT = "tweets";
+	public static final String LANG_MAPPER_BOLT = "langMapper";
+	public static final String FINAL_RANK_BOLT = "langMapper";
+	public static final String LOGER_BOLT = "langMapper";
+	
 	public static final String STREAM_TOTALS_SPOUT_TO_RANK = "totalstorank";
 	public static final String STREAM_SUBRANK_TO_RANK = "subranktorank";
 	public static final String STREAM_RANK_TO_LOGERS = "ranktologers";
+	
 	public static final int LANG_MAPPER_PARALLELISM = 2;
 	public static final int HASHTAG_SPLIT_PARALLELISM = 2;
 	public static final int SUBRANK_PARALLELISM = 2;
@@ -54,12 +59,12 @@ public class Top3App {
 		TopologyBuilder builder = new TopologyBuilder();
 		
 		//Kafka tweet's consumer.
-		builder.setSpout(Top3App.STREAM_TWEETS_SPOUT,spout.getSpout());
+		builder.setSpout(Top3App.TWEETS_SPOUT,spout.getSpout());
 		
 		//Language subStreams
-		builder.setBolt(Top3App.STREAM_LANG_MAPPER_BOLT, new LangBolt(languages),
+		builder.setBolt(Top3App.LANG_MAPPER_BOLT, new LangBolt(languages),
 			Top3App.LANG_MAPPER_PARALLELISM)
-			.shuffleGrouping(Top3App.STREAM_TWEETS_SPOUT);
+			.shuffleGrouping(Top3App.TWEETS_SPOUT);
 		
 		for(String lang:languages){
 			//Hashtag Splitter 
