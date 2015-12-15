@@ -72,7 +72,17 @@ public class FinalRankBolt extends BaseRichBolt {
 		TotalTupleValues tupleVals = TotalTupleValues.fromTuple(input);
 		
 		if(tupleVals != null) {
-			totals.put(tupleVals.getTimeWindow(), tupleVals.getTotal());
+			
+			TimeWindow timeWindow = tupleVals.getTimeWindow();
+			Integer total = tupleVals.getTotal();
+			
+			// Set the total of tweets in that time window
+			this.totals.put(timeWindow, total);
+			
+			// If all the tweets have been processed, finalize
+			if(this.counts.get(timeWindow).equals(total)) {
+				finalizeTimeWindow(timeWindow, this.pendingRanks.get(timeWindow));
+			}
 		}
 		
 	}
@@ -118,7 +128,7 @@ public class FinalRankBolt extends BaseRichBolt {
 			this.counts.put(timeWindow, newCount);
 			
 			// If all the tweets have been processed, log the time window top and clean
-			if(newCount == this.totals.get(timeWindow)) {
+			if(this.totals.get(timeWindow).equals(newCount)) {
 				finalizeTimeWindow(timeWindow, rank);				
 			}
 			
