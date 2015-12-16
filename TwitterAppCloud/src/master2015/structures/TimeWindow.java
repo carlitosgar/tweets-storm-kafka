@@ -6,14 +6,12 @@ public class TimeWindow implements Comparable<TimeWindow> {
 	private static int advance;
 	private static final Object setStartTsLock = new Object();
 	private static Long startTs;
-	private Long lowWindowTs;
-	private Long topWindowTs;
-	private int window;
 	private String language;
 	private Long timestamp;
 	
 	public TimeWindow(String language, Long timestamp) {
-		this.setTimeWindow(language,timestamp);
+		this.language = language;
+		this.timestamp = timestamp;
 	}
 	
 	/**
@@ -32,23 +30,24 @@ public class TimeWindow implements Comparable<TimeWindow> {
 	public TimeWindow copy(){
 		return new TimeWindow(this);
 	}
-
+	
 	public static void configTimeWindow(int size, int advance){
 		TimeWindow.size = size;
 		TimeWindow.advance = advance;
 	}
 	
-	private void setTimeWindow(String language,Long timestamp){
-		Long tsInSec = timestamp / 1000;
+	public static TimeWindow getTimeWindow(String language, Long timestamp){
+		Long currentTs = timestamp / 1000L;
+		Long window = (long) TimeWindow.size;
+		Long ts;
 		if (startTs == null){
-			TimeWindow.setStartTs(tsInSec);
+			TimeWindow.setStartTs(currentTs);
 		}
-		if (this.lowWindowTs == null){
-			this.lowWindowTs = startTs;
-			this.topWindowTs = this.lowWindowTs + size;
+		ts = currentTs - TimeWindow.startTs;
+		while(!(ts < window)){
+			window += TimeWindow.advance;
 		}
-		this.language = language;
-		this.timestamp = (long) this.window * advance + size;
+		return new TimeWindow(language,window);
 	}
 
     private static void setStartTs(Long timestamp) {
@@ -56,17 +55,6 @@ public class TimeWindow implements Comparable<TimeWindow> {
         	startTs = startTs == null ? timestamp : startTs;
         }
     }
-	
-	public void updateWindow(Long ts){
-		this.lowWindowTs += advance;
-		this.topWindowTs += advance;
-		this.window++;
-		this.setTimeWindow(this.language, ts);
-	}
-	
-	public boolean isNewWindow(Long timestamp){
-		return (this.topWindowTs > 0) && (timestamp / 1000 > this.topWindowTs);
-	}
 	
 	public String getLanguage() {
 		return language;
