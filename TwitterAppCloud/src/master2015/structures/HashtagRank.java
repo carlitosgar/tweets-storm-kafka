@@ -52,6 +52,13 @@ public class HashtagRank {
 		return this.getBestN(this.size());
 	}
 	
+	/**
+	 * Clear the ranking.
+	 */
+	public void clear(){
+		this.hashMap.clear();
+	}
+	
 	public int size() {
 		return this.hashMap.size();
 	}

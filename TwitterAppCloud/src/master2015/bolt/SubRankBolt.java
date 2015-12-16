@@ -2,6 +2,7 @@ package master2015.bolt;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -23,16 +24,13 @@ public class SubRankBolt extends BaseRichBolt {
 
 	private static final long serialVersionUID = -3586105017027068572L;
 
-	private TimeWindow tw;
 	private OutputCollector collector;
-	private HashMap<String, HashtagRankEntry> subRank;
-	private int totalTweets;
-	//private HashtagRank subRank;
+	private HashMap<String, HashtagRank> subRanks;
+	private HashMap<String, TimeWindow> timeWindows;
 	
 	public SubRankBolt(){
-		//this.subRank = new HashtagRank();
-		this.subRank = new HashMap<String, HashtagRankEntry>();
-		this.totalTweets = 0;
+		this.subRanks = new HashMap<String, HashtagRank>();
+		this.timeWindows = new HashMap<String,TimeWindow>();
 	}
 	
 	@Override
@@ -51,23 +49,45 @@ public class SubRankBolt extends BaseRichBolt {
 		String lang = (String) input.getValueByField("language");
 		String ht = (String) input.getValueByField("hashtag");
 		Long ts = (Long) input.getValueByField("timestamp");
-		HashtagRankEntry entry = new HashtagRankEntry(lang, ht, 1);
+		HashtagRankEntry newEntry = new HashtagRankEntry(lang, ht, 1);
+		TimeWindow tw = TimeWindow.getTimeWindow(lang, ts);
+		TimeWindow timeWindow = this.timeWindows.put(lang, tw);
 		
-		if(this.tw == null) {
-			this.tw = new TimeWindow(lang, ts);
+		if(timeWindow != null && !timeWindow.equals(tw)){
+			this.emitSubRankAndUpdate(lang, timeWindow, newEntry);
+		} else {
+			this.updateRanking(lang, newEntry);
 		}
-		
-		if(this.tw.isNewWindow(ts)){
-			this.collector.emit(new SubRankTupleValues(this.tw.copy(), this.getBestN(3), this.totalTweets));
-			this.tw.updateWindow(ts);
-			this.subRank = new HashMap<String, HashtagRankEntry>(); //Substitute by remove method.
-			this.totalTweets = 1;
-			this.updateSubRank(entry);
+	}
+	
+	private void updateRanking(String lang, HashtagRankEntry entry){
+		HashtagRank subRank = this.subRanks.get(lang);
+		if(subRank == null){
+			HashtagRank newSubRank = new HashtagRank();
+			newSubRank.add(entry);
+			this.subRanks.put(lang, newSubRank);
+		} else{
+			subRank.add(entry);
 		}
-		else{
-			this.totalTweets++;
-			this.updateSubRank(entry);
+	}
+	
+	private void emitSubRankAndUpdate(String lang, TimeWindow tw, HashtagRankEntry entry){
+		HashtagRank subRank = this.subRanks.get(lang);
+		SubRankTupleValues tuple = 
+				new SubRankTupleValues(tw,subRank.getBestN(3),this.totalTweetsProcessed(subRank));
+		this.collector.emit(tuple);
+		subRank.clear();
+		this.updateRanking(lang, entry);
+	}
+	
+	private int totalTweetsProcessed(HashtagRank subRank){
+		int count = 0;
+		Iterator<HashtagRankEntry> it = subRank.getAll().iterator();
+		while(it.hasNext()){
+			HashtagRankEntry entry = it.next();
+			count += entry.count;
 		}
+		return count;
 	}
 	
 	@Override
@@ -78,24 +98,4 @@ public class SubRankBolt extends BaseRichBolt {
 	@Override
 	public void cleanup() {		
 	}
-	
-	private List<HashtagRankEntry> getBestN(int n) {
-		
-		List<HashtagRankEntry> entries = new LinkedList<HashtagRankEntry>(this.subRank.values());
-		
-		// Sort the entries
-		Collections.sort(entries, Collections.reverseOrder());
-		
-		// Return the top n elements
-		return entries.subList(0, (n < this.subRank.size() ? n : this.subRank.size()));
-		
-	}
-	
-	private void updateSubRank(HashtagRankEntry entry) {
-		HashtagRankEntry previous = this.subRank.put(entry.hashtag, entry);
-		if(previous != null) {
-			entry.count += previous.count;
-		}
-	}
-
 }

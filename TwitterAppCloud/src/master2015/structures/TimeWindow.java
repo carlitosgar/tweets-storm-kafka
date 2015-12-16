@@ -14,23 +14,6 @@ public class TimeWindow implements Comparable<TimeWindow> {
 		this.timestamp = timestamp;
 	}
 	
-	/**
-	* Copy constructor.
-	* @param other
-	*/
-	public TimeWindow(TimeWindow other){
-		this.language = other.language;
-		this.timestamp = other.timestamp;
-	}
-	
-	/**
-	 * Defensive copy.
-	 * @return itself
-	 */
-	public TimeWindow copy(){
-		return new TimeWindow(this);
-	}
-	
 	public static void configTimeWindow(int size, int advance){
 		TimeWindow.size = size;
 		TimeWindow.advance = advance;
