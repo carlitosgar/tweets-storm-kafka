@@ -20,17 +20,19 @@ public class Top3App {
 	public static final int RANK_NUMBER = 3;
 	
 	public static final String TWEETS_SPOUT = "tweets";
-	public static final String LANG_MAPPER_BOLT = "langMapper";
-	public static final String FINAL_RANK_BOLT = "langMapper";
-	public static final String LOGER_BOLT = "langMapper";
+	public static final String LANG_FILTER_BOLT = "langFilter";
+	public static final String HASHTAG_SPLIT_BOLT = "htSplitter";
+	public static final String SUBRANK_BOLT = "subRank";
+	public static final String FINAL_RANK_BOLT = "finalRank";
+	public static final String LOGER_BOLT = "printer";
 	
 	public static final String STREAM_TOTALS_SPOUT_TO_RANK = "totalstorank";
 	public static final String STREAM_SUBRANK_TO_RANK = "subranktorank";
 	public static final String STREAM_RANK_TO_LOGERS = "ranktologers";
 	
-	public static final int LANG_MAPPER_PARALLELISM = 2;
-	public static final int HASHTAG_SPLIT_PARALLELISM = 2;
-	public static final int SUBRANK_PARALLELISM = 2;
+	public static final int LANG_FILTER_PARALLELISM = 1;
+	public static final int HASHTAG_SPLIT_PARALLELISM = 1;
+	public static final int SUBRANK_PARALLELISM = 1;
 
 	public Top3App() {
 		// TODO Auto-generated constructor stub
@@ -61,22 +63,22 @@ public class Top3App {
 		//Kafka tweet's consumer.
 		builder.setSpout(Top3App.TWEETS_SPOUT,spout.getSpout());
 		
-		//Language subStreams
-		builder.setBolt(Top3App.LANG_MAPPER_BOLT, new LangBolt(languages),
-			Top3App.LANG_MAPPER_PARALLELISM)
-			.shuffleGrouping(Top3App.TWEETS_SPOUT);
+		//Language filter.
+		builder.setBolt(Top3App.LANG_FILTER_BOLT, new LangBolt(languages),Top3App.LANG_FILTER_PARALLELISM)
+    		.shuffleGrouping(Top3App.TWEETS_SPOUT);
+
+		//Hashtag Splitter 
+		builder.setBolt(Top3App.HASHTAG_SPLIT_BOLT, new HashtagSplitBolt(),Top3App.HASHTAG_SPLIT_PARALLELISM)
+        	.shuffleGrouping(Top3App.LANG_FILTER_BOLT);
 		
-		for(String lang:languages){
-			//Hashtag Splitter 
-			builder.setBolt("htSplitter_"+lang, new HashtagSplitBolt(),Top3App.HASHTAG_SPLIT_PARALLELISM)
-	        	.shuffleGrouping("langMapper", lang);
-			//Subrank
-			builder.setBolt("subRank_"+lang, new SubRankBolt(),Top3App.SUBRANK_PARALLELISM)
-				.fieldsGrouping("htSplitter_"+lang, new Fields("hashtag"));
-			builder.setBolt("printer_"+lang, new LogBolt())
-				.shuffleGrouping("subRank_"+lang);
-		}
+		//Subrank
+		builder.setBolt(Top3App.SUBRANK_BOLT, new SubRankBolt(),Top3App.SUBRANK_PARALLELISM)
+			.fieldsGrouping(Top3App.HASHTAG_SPLIT_BOLT, new Fields("language","hashtag"));
 		
+		//Printer.
+		builder.setBolt("printer", new LogBolt())
+			.shuffleGrouping(Top3App.SUBRANK_BOLT);
+
 		//Config topology.
 		Config conf = new Config();
 		LocalCluster cluster = new LocalCluster();

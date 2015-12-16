@@ -24,15 +24,13 @@ public class LangBolt extends BaseBasicBolt{
 	@Override
 	public void execute(Tuple input, BasicOutputCollector collector) {
 		if(this.languages.contains(input.getValueByField("language"))) {
-			collector.emit(input.getStringByField("language"), input.getValues());
+			collector.emit(input.getValues());
 		}
 	}
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		for(String lang: this.languages){
-			declarer.declareStream(lang, new Fields("language","hashtags","timestamp"));
-		}
+		declarer.declare(new Fields("language","hashtags","timestamp"));
 	}
 
 }
