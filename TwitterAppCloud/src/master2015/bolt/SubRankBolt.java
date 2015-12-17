@@ -73,8 +73,10 @@ public class SubRankBolt extends BaseRichBolt {
 	
 	private void emitSubRankAndUpdate(String lang, TimeWindow tw, HashtagRankEntry entry){
 		HashtagRank subRank = this.subRanks.get(lang);
-		SubRankTupleValues tuple = 
-				new SubRankTupleValues(tw,subRank.getBestN(3),this.totalTweetsProcessed(subRank));
+		SubRankTupleValues tuple = new SubRankTupleValues(
+				tw,
+				subRank.getBestN(Top3App.RANK_NUMBER),
+				this.totalTweetsProcessed(subRank));
 		this.collector.emit(tuple);
 		subRank.clear();
 		this.updateRanking(lang, entry);

@@ -30,9 +30,9 @@ public class Top3App {
 	public static final String STREAM_SUBRANK_TO_RANK = "subranktorank";
 	public static final String STREAM_RANK_TO_LOGERS = "ranktologers";
 	
-	public static final int LANG_FILTER_PARALLELISM = 1;
-	public static final int HASHTAG_SPLIT_PARALLELISM = 1;
-	public static final int SUBRANK_PARALLELISM = 1;
+	public static final int LANG_FILTER_PARALLELISM = 2;
+	public static final int HASHTAG_SPLIT_PARALLELISM = 2;
+	public static final int SUBRANK_PARALLELISM = 2;
 
 	public Top3App() {
 		// TODO Auto-generated constructor stub

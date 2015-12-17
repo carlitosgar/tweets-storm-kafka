@@ -4,8 +4,6 @@ public class TimeWindow implements Comparable<TimeWindow> {
 
 	private static int size;
 	private static int advance;
-	private static final Object setStartTsLock = new Object();
-	private static Long startTs;
 	private String language;
 	private Long timestamp;
 	
@@ -22,22 +20,11 @@ public class TimeWindow implements Comparable<TimeWindow> {
 	public static TimeWindow getTimeWindow(String language, Long timestamp){
 		Long currentTs = timestamp / 1000L;
 		Long window = (long) TimeWindow.size;
-		Long ts;
-		if (startTs == null){
-			TimeWindow.setStartTs(currentTs);
-		}
-		ts = currentTs - TimeWindow.startTs;
-		while(!(ts < window)){
+		while(!(currentTs < window)){
 			window += TimeWindow.advance;
 		}
 		return new TimeWindow(language,window);
 	}
-
-    private static void setStartTs(Long timestamp) {
-        synchronized (setStartTsLock) {
-        	startTs = startTs == null ? timestamp : startTs;
-        }
-    }
 	
 	public String getLanguage() {
 		return language;
