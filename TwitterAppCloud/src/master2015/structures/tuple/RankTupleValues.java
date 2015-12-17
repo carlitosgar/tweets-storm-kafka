@@ -13,6 +13,7 @@ public class RankTupleValues extends Values {
 	private static final long serialVersionUID = -274169347158612458L;
 	public static final String FIELD_TIME_WINDOW = "timewindow";
 	public static final String FIELD_RANK = "rank";
+	public static final String FIELD_LANGUAGE = "language";
 
 
 	/**
@@ -21,7 +22,7 @@ public class RankTupleValues extends Values {
 	 * @param rank List<HashtagRankEntry> object
 	 */
 	public RankTupleValues(TimeWindow timeWindow, List<HashtagRankEntry> rank) {
-		super(timeWindow, rank);
+		super(timeWindow, rank, timeWindow.getLanguage());
 	}
 	
 	/**
@@ -46,12 +47,16 @@ public class RankTupleValues extends Values {
 		return (List<HashtagRankEntry>) this.get(1);
 	}
 	
+	public String getLanguage() {
+		return (String) this.get(2);
+	}
+	
 	/**
 	 * Get the fields of the tuple.
 	 * @return
 	 */
 	public static Fields getFields() {
-		return new Fields(FIELD_TIME_WINDOW, FIELD_RANK);
+		return new Fields(FIELD_TIME_WINDOW, FIELD_RANK, FIELD_LANGUAGE);
 	}
 	
 

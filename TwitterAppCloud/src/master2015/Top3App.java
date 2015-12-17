@@ -7,6 +7,7 @@ import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
+import master2015.bolt.FileLogBolt;
 import master2015.bolt.FinalRankBolt;
 import master2015.bolt.HashtagSplitBolt;
 import master2015.bolt.LangBolt;
@@ -14,6 +15,7 @@ import master2015.bolt.LogBolt;
 import master2015.bolt.SubRankBolt;
 import master2015.spout.TweetKafkaSpout;
 import master2015.structures.TimeWindow;
+import master2015.structures.tuple.RankTupleValues;
 
 public class Top3App {
 	
@@ -24,6 +26,7 @@ public class Top3App {
 	public static final String HASHTAG_SPLIT_BOLT = "htSplitter";
 	public static final String SUBRANK_BOLT = "subRank";
 	public static final String FINAL_RANK_BOLT = "finalRank";
+	public static final String FILE_LOGER_BOLT = "fileLoger";
 	public static final String LOGER_BOLT = "printer";
 	
 	public static final String STREAM_TOTALS_SPOUT_TO_RANK = "totalstorank";
@@ -33,6 +36,8 @@ public class Top3App {
 	public static final int LANG_FILTER_PARALLELISM = 2;
 	public static final int HASHTAG_SPLIT_PARALLELISM = 2;
 	public static final int SUBRANK_PARALLELISM = 2;
+	public static final int FINAL_RANK_PARALLELISM = 1; 
+	public static final int FILE_LOGER_PARALLELISM = 1; //Should not be greater than the number of languages
 
 	public Top3App() {
 		// TODO Auto-generated constructor stub
@@ -61,23 +66,31 @@ public class Top3App {
 		TopologyBuilder builder = new TopologyBuilder();
 		
 		//Kafka tweet's consumer.
-		builder.setSpout(Top3App.TWEETS_SPOUT,spout.getSpout());
+		builder.setSpout(TWEETS_SPOUT,spout.getSpout());
 		
 		//Language filter.
-		builder.setBolt(Top3App.LANG_FILTER_BOLT, new LangBolt(languages),Top3App.LANG_FILTER_PARALLELISM)
-    		.shuffleGrouping(Top3App.TWEETS_SPOUT);
+		builder.setBolt(LANG_FILTER_BOLT, new LangBolt(languages),LANG_FILTER_PARALLELISM)
+    		.shuffleGrouping(TWEETS_SPOUT);
 
 		//Hashtag Splitter 
-		builder.setBolt(Top3App.HASHTAG_SPLIT_BOLT, new HashtagSplitBolt(),Top3App.HASHTAG_SPLIT_PARALLELISM)
-        	.shuffleGrouping(Top3App.LANG_FILTER_BOLT);
+		builder.setBolt(HASHTAG_SPLIT_BOLT, new HashtagSplitBolt(),HASHTAG_SPLIT_PARALLELISM)
+        	.shuffleGrouping(LANG_FILTER_BOLT);
 		
 		//Subrank
-		builder.setBolt(Top3App.SUBRANK_BOLT, new SubRankBolt(),Top3App.SUBRANK_PARALLELISM)
-			.fieldsGrouping(Top3App.HASHTAG_SPLIT_BOLT, new Fields("language","hashtag"));
+		builder.setBolt(SUBRANK_BOLT, new SubRankBolt(),SUBRANK_PARALLELISM)
+			.fieldsGrouping(HASHTAG_SPLIT_BOLT, new Fields("language","hashtag"));
+
+		//Final Rank
+		builder.setBolt(FINAL_RANK_BOLT, new FinalRankBolt(),FINAL_RANK_PARALLELISM)
+			.globalGrouping(SUBRANK_BOLT, STREAM_SUBRANK_TO_RANK);
 		
+		//File loger
+		builder.setBolt(FILE_LOGER_BOLT, new FileLogBolt(), FILE_LOGER_PARALLELISM)
+			.fieldsGrouping(FINAL_RANK_BOLT, STREAM_RANK_TO_LOGERS, new Fields(RankTupleValues.FIELD_LANGUAGE));
+				
 		//Printer.
 		builder.setBolt("printer", new LogBolt())
-			.shuffleGrouping(Top3App.SUBRANK_BOLT);
+			.shuffleGrouping(SUBRANK_BOLT);
 
 		//Config topology.
 		Config conf = new Config();
