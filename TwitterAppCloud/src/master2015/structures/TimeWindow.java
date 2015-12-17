@@ -8,7 +8,7 @@ public class TimeWindow implements Comparable<TimeWindow> {
 	private static int size;
 	private static int advance;
 	private String language;
-	private Long timestamp;
+	private Long timestamp; //Time in seconds
 	
 	public TimeWindow(String language, Long timestamp) {
 		this.language = language;

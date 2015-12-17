@@ -68,7 +68,7 @@ public class FileLogBolt extends BaseRichBolt {
 	 * @return
 	 */
 	private String getLogTextFromTuple(RankTupleValues tupleVals) {
-		String s = tupleVals.getTimeWindow().getTimestamp()
+		String s = tupleVals.getTimeWindow().getTimestamp() * 1000
 				+ "," + tupleVals.getTimeWindow().getLanguage();
 		
 		List<HashtagRankEntry> rank = tupleVals.getRank();
