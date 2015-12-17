@@ -1,9 +1,8 @@
 package master2015.tests;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.junit.Before;
@@ -147,5 +146,142 @@ public class TimeWindowTest {
 		for (int i=0; i<tw.size(); i++){
 			assertTrue(tw.get(i).equals(twsA.get(i)));
 		}
+	}
+	
+	@Test
+	public void getFirstTimeWindowTime_random_same() {
+		
+		int advance = 10;
+		int size = 10;
+		TimeWindow.configTimeWindow(size, advance);
+		
+		testRandomTimestamps(advance, size, 100, 14503);
+		
+	}
+	
+	@Test
+	public void getFirstTimeWindowTime_random_multiples() {
+		
+		int size = 10;
+		int advance = 5;
+		
+		TimeWindow.configTimeWindow(size, advance);
+		
+		testRandomTimestamps(advance, size, 100, 14503);
+		
+	}
+	
+	@Test
+	public void getFirstTimeWindowTime_random_not_multiples() {
+		
+		int size = 97;
+		int advance = 13;
+		
+		TimeWindow.configTimeWindow(size, advance);
+		
+		testRandomTimestamps(advance, size, 100, 145037);
+		
+	}
+	
+	@Test
+	public void getFirstTimeWindowTime_random_random() {
+		
+		int size, advance;
+		for(int x = 0; x < 1000; ++x) {
+			
+			size = (int) (Math.random() * 100000);
+			advance = (int) (Math.random() * size);
+			
+			TimeWindow.configTimeWindow(size, advance);
+			
+			testRandomTimestamps(advance, size, 100, 1450379);
+		}
+		
+	}
+	
+	@Test
+	public void getFirstTimeWindowTime_linear() {
+		
+		int size, advance;
+		for(size = 1; size < 300; ++size) {
+			for(advance = 1; advance <= size; advance++) {
+				
+				TimeWindow.configTimeWindow(size, advance);
+				testRandomTimestamps(advance, size, 100, 30000);
+				
+			}
+		}
+	
+	}
+	
+	@Test
+	public void getFirstTimeWindowTime_linear_primes() {
+		
+		int size, advance;
+		int total = 25;
+		int[] primes = getNPrimeNumbers(total);
+		for(int x = 1; x < total; ++x) {
+			for(int y = 1; y <= x; y++) {
+				
+				size = primes[x];
+				advance = primes[y];
+
+				TimeWindow.configTimeWindow(size, advance);
+				testRandomTimestamps(advance, size, 100, 1000000);
+				
+			}
+		}
+	
+	}
+	
+	@Test(timeout=20)
+	public void getFirstTimeWindowTime_performance() {
+		
+		int size = 97;
+		int advance = 13;
+		
+		TimeWindow.configTimeWindow(size, advance);
+		TimeWindow.getFirstTimeWindowTime(7094901566810L);
+		
+	}
+	
+	private int[] getNPrimeNumbers(int n) {
+		int[] nums = new int[n];
+		// loop through the numbers one by one
+		
+		for (int i = 1, x = 0; x<n; i++) {
+	
+			boolean isPrimeNumber = true;
+	
+			// check to see if the number is prime
+			for (int j = 2; j < i; j++) {
+				if (i % j == 0) {
+					isPrimeNumber = false;
+					break; // exit the inner for loop
+				}
+			}
+			
+			if (isPrimeNumber) {
+				nums[x++] = i;
+			}
+		}
+		
+		return nums;
+	}
+	
+	private void testRandomTimestamps(int advance, int size, int iterations, long maxTimestamp) {
+		
+		for(int x = 0; x < iterations; ++x) {
+			Long timestamp = (long) (Math.random() * maxTimestamp); //1450379828
+			Long window = (long) size;
+			while(!(timestamp < window)){
+				window += advance;
+			}
+			
+			//Compare
+			assertEquals("Failed for timestamp=" + timestamp + ", size=" + size + ", adv=" + advance, 
+					window, TimeWindow.getFirstTimeWindowTime(timestamp));
+		}
+		
 	}
 }

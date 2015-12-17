@@ -46,6 +46,51 @@ public class TimeWindow implements Comparable<TimeWindow> {
 		return tws;
 	}
 	
+	public static Long getFirstTimeWindowTime(Long timestamp) {
+		long windowNumber;
+		
+		if(timestamp < TimeWindow.size) {
+			return (long) TimeWindow.size; //First window
+		} else {
+			Long lowerMultiple = timestamp - (timestamp % TimeWindow.advance);
+			int dif = TimeWindow.size - TimeWindow.advance;
+			
+			//Get closer to the real window
+			windowNumber = lowerMultiple / TimeWindow.advance;
+			
+			//Bugfix: move some windows before and apply brute force
+			windowNumber -= Math.ceil(dif / TimeWindow.advance);
+			
+			//Little correction of the window
+			long window =  ((windowNumber - 1L) * ((long)TimeWindow.advance)) + ((long)TimeWindow.size);
+			while(!(timestamp < window)){
+				window += TimeWindow.advance;
+			}
+
+			return window;
+		}
+		
+	}
+	
+	/* 
+	 public static Long getFirstTimeWindowTime(Long timestamp) {
+		int windowNumber;
+		
+		if(timestamp < TimeWindow.advance) {
+			windowNumber = 1; //First window
+		} else {
+			Long lowerMultiple = timestamp - (timestamp % TimeWindow.advance);
+			int dif = TimeWindow.size - TimeWindow.advance;
+			windowNumber = (int) (lowerMultiple / TimeWindow.advance);
+			if(timestamp - lowerMultiple >= dif) {
+				windowNumber++;
+			}
+		}
+		
+		return (long) ((windowNumber - 1) * TimeWindow.advance) + TimeWindow.size;
+	}
+	  */
+	
 	public String getLanguage() {
 		return language;
 	}
