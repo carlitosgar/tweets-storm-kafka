@@ -1,5 +1,8 @@
 package master2015.structures;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TimeWindow implements Comparable<TimeWindow> {
 
 	private static int size;
@@ -24,6 +27,23 @@ public class TimeWindow implements Comparable<TimeWindow> {
 			window += TimeWindow.advance;
 		}
 		return new TimeWindow(language,window);
+	}
+	
+	public static List<TimeWindow> getAllTimeWindow(String language, Long timestamp){
+		List<TimeWindow> tws = new ArrayList<TimeWindow>();
+		Long currentTs = timestamp / 1000L;
+		Long window = (long) TimeWindow.size;
+		while(!(currentTs < window)){
+			window += TimeWindow.advance;
+		}
+		Long prevWindow = window - TimeWindow.size;
+		int nAdvances = (int) Math.floor((currentTs - prevWindow) / TimeWindow.advance);
+		TimeWindow tw;
+		for(int i = 0; i<=nAdvances; i++){
+			tw = new TimeWindow(language,i*TimeWindow.advance+window);
+			tws.add(tw);
+		}
+		return tws;
 	}
 	
 	public String getLanguage() {
