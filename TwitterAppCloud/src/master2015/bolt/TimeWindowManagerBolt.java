@@ -15,12 +15,19 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import backtype.storm.utils.Utils;
+import master2015.Top3App;
 import master2015.structures.TimeWindow;
+import master2015.structures.tuple.TotalTupleValues;
 
 public class TimeWindowManagerBolt extends BaseRichBolt{
 
 	private static final long serialVersionUID = -1078494623581520582L;
 	private HashMap<Long, HashMap<String,Queue<Values>>> timeWindowsTuples;
+	
+	/**
+	 * This hashmap contains the count of tuples per language for the current window
+	 */
+	private HashMap<TimeWindow, Integer> tuplesCount;
 	private OutputCollector collector;
 	private Long window;
 	
@@ -45,18 +52,31 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 		Long tsWindow = tws.get(0).getTimestamp();
 		TimeWindow tw;
 		Values tuple;
+		
 		if (this.isFirstWindow()){ // First tuple
 			this.window = tsWindow;
-		} else if (!this.isSameWindow(tsWindow)){
+		} else if (!this.isSameWindow(tsWindow)){ // Change of time window
 			this.emitTimeWindowTuples(tsWindow,lang);
+			
+			//Send totals for all the languages of the old time window
+			for(String windowLang: this.timeWindowsTuples.get(tsWindow).keySet()) {
+				this.sendTimeWindowCount(new TimeWindow(windowLang, this.window));
+			}
+			
 			this.window = tsWindow;
 		}
+		
 		// Process all time-windows for tuple.
 		Iterator<TimeWindow> it = tws.iterator();
 		while(it.hasNext()){
+			
 			tw = it.next();
 			tsWindow = tw.getTimestamp();
 			tuple = new Values(lang,ht,tw);
+			
+			//Increment the tuple count
+			incrementTimeWindowCount(tw);
+			
 			if (this.isSameWindow(tsWindow)){
 				this.collector.emit(tuple);
 			} else {
@@ -100,6 +120,22 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 			langQueues.put(lang, queue);
 		} else {
 			queue.add(tuple);
+		}
+	}
+	
+	private void incrementTimeWindowCount(TimeWindow tw) {
+		Integer count = this.tuplesCount.get(tw);
+		if(count != null) {
+			this.tuplesCount.put(tw, count + 1);
+		} else {
+			this.tuplesCount.put(tw, 1);
+		}
+	}
+	
+	private void sendTimeWindowCount(TimeWindow tw) {
+		Integer count = this.tuplesCount.get(tw);
+		if(count != null) {
+			this.collector.emit(Top3App.STREAM_MANAGER_TO_RANK, new TotalTupleValues(tw, count));
 		}
 	}
 
