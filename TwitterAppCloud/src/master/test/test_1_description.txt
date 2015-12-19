@@ -1,0 +1,9 @@
+Tamaño: 1000
+Avance: 1000
+Este test prueba:
+* Un solo idioma
+* Varias ventanas
+* Espacios entre ventanas
+* Ventanas que no llenan los 3 hashtags
+* Límites de las ventanas (ej: 1450525999999)
+* Que si la cuenta de varios hashtags es igual, se ordena alfabéticamente (GRAMYs antes que GRAMYt)
