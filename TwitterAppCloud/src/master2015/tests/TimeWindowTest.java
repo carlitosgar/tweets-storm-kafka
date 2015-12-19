@@ -40,6 +40,19 @@ public class TimeWindowTest {
 		twsA.add(tws2);
 	}
 	
+	/*@Test
+	public void getFirstTimeWindow0() {
+		
+		int advance = 3;
+		int size = 5;
+		Long ts = 4000L;
+		Long twFinal = 5L;
+		Long tw;
+		TimeWindow.configTimeWindow(size, advance);
+		tw = TimeWindow.getFirstTimeWindowTime(ts);
+		assertTrue(twFinal.equals(tw));		
+	}*/
+	
 	@Test
 	public void GetTimeWindow_SameSizeAdvance_FirstTs() {
 		int advance = 10;

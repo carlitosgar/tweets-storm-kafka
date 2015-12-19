@@ -1,5 +1,6 @@
 package master2015.bolt;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,6 +15,7 @@ import master2015.structures.tuple.SubRankTupleValues;
 
 public class LogBolt implements IBasicBolt{
 
+	private static final long serialVersionUID = -3036283373801967417L;
 	private static final ObjectMapper objectMapper = new ObjectMapper();
 	private int logID;
 	
@@ -33,7 +35,7 @@ public class LogBolt implements IBasicBolt{
 	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(Tuple tuple, BasicOutputCollector collector) {	
-		SubRankTupleValues tupleVals = SubRankTupleValues.fromTuple(tuple);
+		/*SubRankTupleValues tupleVals = SubRankTupleValues.fromTuple(tuple);
 		TimeWindow timeWindow = tupleVals.getTimeWindow();
 		List<HashtagRankEntry> subRank = tupleVals.getRank();
 		int i = 1;
@@ -42,8 +44,8 @@ public class LogBolt implements IBasicBolt{
 		for(HashtagRankEntry entry : subRank){
 			System.out.println("Top "+i+": "+entry.hashtag+ " "+entry.count+ " "+entry.language);
 			i++;
-		}
-		//System.out.println(timeWindow.getTimestamp());
+		}*/
+		System.out.println(tuple);
 	}
 
 	@Override

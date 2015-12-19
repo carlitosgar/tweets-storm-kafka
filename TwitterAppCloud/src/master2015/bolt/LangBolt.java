@@ -1,13 +1,18 @@
 package master2015.bolt;
 
 import java.util.List;
+import java.util.Map;
+
+import backtype.storm.task.OutputCollector;
+import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseBasicBolt;
+import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
-public class LangBolt extends BaseBasicBolt{
+public class LangBolt extends BaseRichBolt{
 	
 	private static final long serialVersionUID = 9129598163544824838L;
 	
@@ -16,15 +21,22 @@ public class LangBolt extends BaseBasicBolt{
 	 * this bolt.
 	 */
 	private List<String> languages;
+	private OutputCollector collector;
 	
 	public LangBolt(List<String> languages){
 		this.languages = languages;
 	}
+	
+	@Override
+	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
+		this.collector = collector;
+		
+	}
 
 	@Override
-	public void execute(Tuple input, BasicOutputCollector collector) {
+	public void execute(Tuple input) {
 		if(this.languages.contains(input.getValueByField("language"))) {
-			collector.emit(input.getValues());
+			this.collector.emit(input.getValues());
 		}
 	}
 

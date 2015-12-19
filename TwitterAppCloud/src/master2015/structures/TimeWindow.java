@@ -66,7 +66,6 @@ public class TimeWindow implements Comparable<TimeWindow> {
 			while(!(timestamp < window)){
 				window += TimeWindow.advance;
 			}
-
 			return window;
 		}
 		

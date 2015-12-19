@@ -13,6 +13,7 @@ import master2015.bolt.HashtagSplitBolt;
 import master2015.bolt.LangBolt;
 import master2015.bolt.LogBolt;
 import master2015.bolt.SubRankBolt;
+import master2015.bolt.TimeWindowManagerBolt;
 import master2015.spout.TweetKafkaSpout;
 import master2015.structures.TimeWindow;
 import master2015.structures.tuple.RankTupleValues;
@@ -33,9 +34,9 @@ public class Top3App {
 	public static final String STREAM_SUBRANK_TO_RANK = "subranktorank";
 	public static final String STREAM_RANK_TO_LOGERS = "ranktologers";
 	
-	public static final int LANG_FILTER_PARALLELISM = 2;
-	public static final int HASHTAG_SPLIT_PARALLELISM = 2;
-	public static final int SUBRANK_PARALLELISM = 2;
+	public static final int LANG_FILTER_PARALLELISM = 1;
+	public static final int HASHTAG_SPLIT_PARALLELISM = 1;
+	public static final int SUBRANK_PARALLELISM = 1;
 	public static final int FINAL_RANK_PARALLELISM = 1; 
 	public static final int FILE_LOGER_PARALLELISM = 1; //Should not be greater than the number of languages
 
@@ -52,15 +53,20 @@ public class Top3App {
 		
 		//Get list of languages
 		List<String> languages = new ArrayList<String>();
-		String[] langs = args[0].split(",");
-		for(String lang:langs){
-			languages.add(lang);
+		String[] langs;
+		if(args[0].contains(",")){
+			langs = args[0].split(",");
+			for(String lang:langs){
+				languages.add(lang);
+			}
+		}else{
+			languages.add(args[0]);
 		}
 		
 		//Config time window.
 		String[] twParams = args[2].split(",");
 		TimeWindow.configTimeWindow(Integer.parseInt(twParams[0]), Integer.parseInt(twParams[1]));
-		
+
 		//Build topology.
 		TweetKafkaSpout spout = new TweetKafkaSpout("twitterStream", args[1]);
 		TopologyBuilder builder = new TopologyBuilder();
@@ -75,12 +81,16 @@ public class Top3App {
 		//Hashtag Splitter 
 		builder.setBolt(HASHTAG_SPLIT_BOLT, new HashtagSplitBolt(),HASHTAG_SPLIT_PARALLELISM)
         	.shuffleGrouping(LANG_FILTER_BOLT);
+
+		//Time manager 
+		builder.setBolt("timemanager", new TimeWindowManagerBolt())
+        	.shuffleGrouping(HASHTAG_SPLIT_BOLT);
 		
 		//Subrank
-		builder.setBolt(SUBRANK_BOLT, new SubRankBolt(),SUBRANK_PARALLELISM)
-			.fieldsGrouping(HASHTAG_SPLIT_BOLT, new Fields("language","hashtag"));
+		builder.setBolt(SUBRANK_BOLT, new SubRankBolt())
+			.fieldsGrouping("timemanager", new Fields("language","hashtag"));
 
-		//Final Rank
+		/*//Final Rank
 		builder.setBolt(FINAL_RANK_BOLT, new FinalRankBolt(),FINAL_RANK_PARALLELISM)
 			.globalGrouping(SUBRANK_BOLT, STREAM_SUBRANK_TO_RANK);
 		
@@ -90,7 +100,7 @@ public class Top3App {
 				
 		//Printer.
 		builder.setBolt("printer", new LogBolt())
-			.shuffleGrouping(SUBRANK_BOLT);
+			.shuffleGrouping(SUBRANK_BOLT);*/
 
 		//Config topology.
 		Config conf = new Config();

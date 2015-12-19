@@ -48,11 +48,9 @@ public class SubRankBolt extends BaseRichBolt {
 	public void execute(Tuple input) {
 		String lang = (String) input.getValueByField("language");
 		String ht = (String) input.getValueByField("hashtag");
-		Long ts = (Long) input.getValueByField("timestamp");
+		TimeWindow tw = (TimeWindow) input.getValueByField("timewindow");
 		HashtagRankEntry newEntry = new HashtagRankEntry(lang, ht, 1);
-		TimeWindow tw = TimeWindow.getTimeWindow(lang, ts);
 		TimeWindow timeWindow = this.timeWindows.put(lang, tw);
-		
 		if(timeWindow != null && !timeWindow.equals(tw)){
 			this.emitSubRankAndUpdate(lang, timeWindow, newEntry);
 		} else {

@@ -1,0 +1,7 @@
+Comandos para levantar zookeeper, servidor de kafka y crear topic.
+
+bin/zookeeper-server-start.sh config/zookeeper.properties
+
+bin/kafka-server-start.sh config/server.properties
+
+bin/kafka-topics.sh --create --topic twitterStream --zookeeper localhost:2181 --partition 1 --replication-factor 1
