@@ -1,0 +1,5 @@
+Tamaño: 1000
+Avance: 1000
+Este test prueba:
+* Varios idiomas
+* Mismas condiciones que test1
