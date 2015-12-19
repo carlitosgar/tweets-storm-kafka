@@ -29,10 +29,12 @@ public class Top3App {
 	public static final String FINAL_RANK_BOLT = "finalRank";
 	public static final String FILE_LOGER_BOLT = "fileLoger";
 	public static final String LOGER_BOLT = "printer";
+	public static final String TIME_MANAGER_BOLT = "timemanager";
 	
 	public static final String STREAM_TOTALS_SPOUT_TO_RANK = "totalstorank";
 	public static final String STREAM_SUBRANK_TO_RANK = "subranktorank";
 	public static final String STREAM_RANK_TO_LOGERS = "ranktologers";
+	public static final String STREAM_MANAGER_TO_RANK = "managertorank";
 	
 	public static final int LANG_FILTER_PARALLELISM = 1;
 	public static final int HASHTAG_SPLIT_PARALLELISM = 1;
@@ -83,16 +85,17 @@ public class Top3App {
         	.shuffleGrouping(LANG_FILTER_BOLT);
 
 		//Time manager 
-		builder.setBolt("timemanager", new TimeWindowManagerBolt())
+		builder.setBolt(TIME_MANAGER_BOLT, new TimeWindowManagerBolt())
         	.shuffleGrouping(HASHTAG_SPLIT_BOLT);
 		
 		//Subrank
 		builder.setBolt(SUBRANK_BOLT, new SubRankBolt())
-			.fieldsGrouping("timemanager", new Fields("language","hashtag"));
+			.fieldsGrouping(TIME_MANAGER_BOLT, new Fields("language","hashtag"));
 
 		/*//Final Rank
 		builder.setBolt(FINAL_RANK_BOLT, new FinalRankBolt(),FINAL_RANK_PARALLELISM)
-			.globalGrouping(SUBRANK_BOLT, STREAM_SUBRANK_TO_RANK);
+			.globalGrouping(SUBRANK_BOLT, STREAM_SUBRANK_TO_RANK)
+			.globalGrouping(TIME_MANAGER_BOLT, STREAM_MANAGER_TO_RANK);
 		
 		//File loger
 		builder.setBolt(FILE_LOGER_BOLT, new FileLogBolt(), FILE_LOGER_PARALLELISM)
