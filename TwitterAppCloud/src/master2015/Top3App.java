@@ -118,13 +118,17 @@ public class Top3App {
 				
 		//Printer.
 		builder.setBolt("printer", new LogBolt())
-			.shuffleGrouping(SUBRANK_BOLT);*/
-
+			.shuffleGrouping(SUBRANK_BOLT);
+*/
 		//Config topology.
 		Config conf = new Config();
 		conf.setNumAckers(0);
 		LocalCluster cluster = new LocalCluster();
+		
+		System.out.print("Sending topology...");
 	    cluster.submitTopology(topologyName, conf, builder.createTopology());
+	    System.out.println(" Done!");
+	    
 	    //Set topology life-cycle.
 	    Thread.sleep((long) 10000);
 	    cluster.killTopology(topologyName);

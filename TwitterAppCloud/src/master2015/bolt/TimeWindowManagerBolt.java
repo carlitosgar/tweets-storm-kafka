@@ -1,7 +1,7 @@
 package master2015.bolt;
 
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +14,6 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
-import backtype.storm.utils.Utils;
 import master2015.Top3App;
 import master2015.structures.TimeWindow;
 import master2015.structures.tuple.TotalTupleValues;
@@ -22,20 +21,27 @@ import master2015.structures.tuple.TotalTupleValues;
 public class TimeWindowManagerBolt extends BaseRichBolt{
 
 	private static final long serialVersionUID = -1078494623581520582L;
-	private HashMap<Long, HashMap<String,Queue<Values>>> timeWindowsTuples;
+	private HashMap<Long, Queue<Values>> timeWindowsTuples;
+	
+	/**
+	 * This hashmap contains the list of unique TimeWindows received per window timestamp
+	 */
+	private HashMap<Long, HashSet<TimeWindow>> uniqueTimeWindows = new HashMap<Long, HashSet<TimeWindow>>();
 	
 	/**
 	 * This hashmap contains the count of tuples per language for the current window
 	 */
-	private HashMap<TimeWindow, Integer> tuplesCount;
+	private HashMap<TimeWindow, Integer> tuplesCount = new HashMap<TimeWindow, Integer>();
+	
 	private OutputCollector collector;
 	private Long window;
 	
 	public TimeWindowManagerBolt(){
-		this.timeWindowsTuples = new HashMap<Long, HashMap<String,Queue<Values>>>();
+		this.timeWindowsTuples = new HashMap<Long, Queue<Values>>();
 		this.window = 0L;
 	}
 	
+	@SuppressWarnings("rawtypes")
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
 		this.collector = collector;	
@@ -47,43 +53,47 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 		String ht = (String) input.getValueByField("hashtag");
 		Long timestamp = (Long) input.getValueByField("timestamp");
 		
+		//TODO: behaviour in case of blank tuple
+		
 		// Generate possible time windows.
 		List<TimeWindow> tws = TimeWindow.getAllTimeWindow(lang, timestamp);
 		Long tsWindow = tws.get(0).getTimestamp();
-		TimeWindow tw;
-		Values tuple;
-		System.out.println("TimeManager");
+		
 		if (this.isFirstWindow()){ // First tuple
 			this.window = tsWindow;
+			
 		} else if (!this.isSameWindow(tsWindow)){ // Change of time window
+
+			// Emit all the queued tuples for the new window
 			this.emitTimeWindowTuples(tsWindow);
-			
-			//Send totals for all the languages of the old time window
-			for(String windowLang: this.timeWindowsTuples.get(tsWindow).keySet()) {
-				this.sendTimeWindowCount(new TimeWindow(windowLang, this.window));
+
+			// Send totals for all the different TimeWindows of the old timestamp
+			for(TimeWindow timeWindow: this.uniqueTimeWindows.get(this.window)) {
+				this.sendTimeWindowCount(timeWindow);
 			}
+			this.uniqueTimeWindows.remove(this.window);
+			
+			// Set the new window
 			this.window = tsWindow;
+			
 		}
-		System.out.println("Process tuple");
+		
 		// Process all time-windows for tuple.
-		Iterator<TimeWindow> it = tws.iterator();
-		while(it.hasNext()){
-			
-			tw = it.next();
+		for(TimeWindow tw : tws) {
 			tsWindow = tw.getTimestamp();
-			tuple = new Values(lang,ht,tw);
+			Values tuple = new Values(lang, ht, tw);
 			
-			//Increment the tuple count
-			System.out.println("IncCountInit");
+			//Increment the tuple count of that TimeWindow
 			incrementTimeWindowCount(tw);
-			System.out.println("IncCountEnd");
+			
 			if (this.isSameWindow(tsWindow)){
 				System.out.println("Emit!!! : " + tuple + ", " + tsWindow);
-				this.collector.emit(Top3App.STREAM_MANAGER_TO_SUBRANK,tuple);
+				this.collector.emit(Top3App.STREAM_MANAGER_TO_SUBRANK, tuple);
 			} else {
-				this.keepFutureTuple(tsWindow,lang, tuple);
+				this.keepFutureTuple(tsWindow, lang, tuple);
 			}
-		}	
+		}
+
 	}
 	
 	private boolean isFirstWindow(){
@@ -94,62 +104,63 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 		return ts.equals(this.window);
 	}
 	
+	/**
+	 * This method sends all the tuples queued for a given window timestamp
+	 * @param ts Window timestamp
+	 */
 	private void emitTimeWindowTuples(Long ts){
-		HashMap<String,Queue<Values>> langQueues = this.timeWindowsTuples.get(ts);
-		String lang;
-		Iterator<String> it;
-		if (langQueues != null){
-			it = langQueues.keySet().iterator();
-			while(it.hasNext()){
-				lang = it.next();
-				Queue<Values> queue = langQueues.get(lang);
-				boolean emitBlank = true;
-				while(queue != null && !queue.isEmpty()){
-					if(emitBlank){
-						System.out.println("Emit blank " + lang);
-						this.collector.emit(Top3App.STREAM_MANAGER_TO_SUBRANK,new Values(lang,"",null)); //Emit blank tuple (change).
-						emitBlank = false;
-					}
-					Values tuple = queue.poll();
-					System.out.println("EmitAll!!! : " + tuple + ", " + ts);
-					this.collector.emit(Top3App.STREAM_MANAGER_TO_SUBRANK,tuple);
-				}
-				langQueues.remove(lang);
+		Queue<Values> queue = this.timeWindowsTuples.get(ts);
+		if (queue != null) {
+			
+			for(Values values : queue) {
+				System.out.println("EmitAll!!! : " + values + ", " + ts);
+				this.collector.emit(Top3App.STREAM_MANAGER_TO_SUBRANK,values);
 			}
-			if (langQueues.isEmpty()){
-				this.timeWindowsTuples.remove(ts);
-			}
+			
+			// Free memory
+			queue.clear();
+			this.timeWindowsTuples.remove(ts);
+			
 		}
 	}
 	
 	private void keepFutureTuple(Long ts, String lang,Values tuple){
 		System.out.println("Keep!!! : " + tuple + ", " + ts);
-		HashMap<String,Queue<Values>> langQueues = this.timeWindowsTuples.get(ts);
-		if(langQueues == null){
-			langQueues = new HashMap<String,Queue<Values>>();
-			this.timeWindowsTuples.put(ts, langQueues);
-		}
-		Queue<Values> queue = langQueues.get(lang);
+		Queue<Values> queue = this.timeWindowsTuples.get(ts);
 		if(queue == null){
 			queue = new LinkedList<Values>();
-			queue.add(tuple);
-			langQueues.put(lang, queue);
-		} else {
-			queue.add(tuple);
+			this.timeWindowsTuples.put(ts, queue);
 		}
 	}
 	
 	private void incrementTimeWindowCount(TimeWindow tw) {
+		
 		Integer count = this.tuplesCount.get(tw);
+		
 		if(count != null) {
 			this.tuplesCount.put(tw, count + 1);
-		} else {
+			
+		} else { // Is a new TimeWindow
+			
+			HashSet<TimeWindow> windowSet;
+			
+			// If it is the first TimeWindow for that timestamp
+			if((windowSet = this.uniqueTimeWindows.get(tw.getTimestamp())) == null) {
+				windowSet = new HashSet<TimeWindow>();
+				this.uniqueTimeWindows.put(tw.getTimestamp(), windowSet);
+			}
+			
+			// Add it to the list of TimeWindows for that timestamp
+			windowSet.add(tw);
+			
+			// Initialize the count
 			this.tuplesCount.put(tw, 1);
 		}
+		
 	}
 	
 	private void sendTimeWindowCount(TimeWindow tw) {
-		Integer count = this.tuplesCount.get(tw);
+		Integer count = this.tuplesCount.remove(tw);
 		if(count != null) {
 			this.collector.emit(Top3App.STREAM_MANAGER_TO_RANK, new TotalTupleValues(tw, count));
 		}

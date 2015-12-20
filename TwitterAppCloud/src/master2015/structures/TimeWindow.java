@@ -92,4 +92,9 @@ public class TimeWindow implements Comparable<TimeWindow> {
 		
 		return this.language.equals(o.getLanguage()) && this.timestamp.equals(o.getTimestamp());
 	}
+	
+	@Override
+	public String toString() {
+		return "TimeWindow{"+this.language+","+this.timestamp+"}";
+	}
 }
