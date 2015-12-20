@@ -35,6 +35,7 @@ public class Top3App {
 	public static final String STREAM_SUBRANK_TO_RANK = "subranktorank";
 	public static final String STREAM_RANK_TO_LOGERS = "ranktologers";
 	public static final String STREAM_MANAGER_TO_RANK = "managertorank";
+	public static final String STREAM_MANAGER_TO_SUBRANK = "managertosubrank";
 	
 	public static final int LANG_FILTER_PARALLELISM = 1;
 	public static final int HASHTAG_SPLIT_PARALLELISM = 1;

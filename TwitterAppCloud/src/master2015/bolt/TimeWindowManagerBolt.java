@@ -56,13 +56,12 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 		if (this.isFirstWindow()){ // First tuple
 			this.window = tsWindow;
 		} else if (!this.isSameWindow(tsWindow)){ // Change of time window
-			this.emitTimeWindowTuples(tsWindow,lang);
+			this.emitTimeWindowTuples(tsWindow);
 			
 			//Send totals for all the languages of the old time window
 			for(String windowLang: this.timeWindowsTuples.get(tsWindow).keySet()) {
 				this.sendTimeWindowCount(new TimeWindow(windowLang, this.window));
 			}
-			
 			this.window = tsWindow;
 		}
 		
@@ -78,7 +77,8 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 			incrementTimeWindowCount(tw);
 			
 			if (this.isSameWindow(tsWindow)){
-				this.collector.emit(tuple);
+				System.out.println("Emit!!! : " + tuple + ", " + tsWindow);
+				this.collector.emit(Top3App.STREAM_MANAGER_TO_SUBRANK,tuple);
 			} else {
 				this.keepFutureTuple(tsWindow,lang, tuple);
 			}
@@ -93,14 +93,28 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 		return ts.equals(this.window);
 	}
 	
-	private void emitTimeWindowTuples(Long ts, String lang){
+	private void emitTimeWindowTuples(Long ts){
 		HashMap<String,Queue<Values>> langQueues = this.timeWindowsTuples.get(ts);
+		String lang;
+		Iterator<String> it;
 		if (langQueues != null){
-			Queue<Values> queue = langQueues.get(lang);
-			while(queue != null && !queue.isEmpty()){
-				this.collector.emit(queue.poll());
+			it = langQueues.keySet().iterator();
+			while(it.hasNext()){
+				lang = it.next();
+				Queue<Values> queue = langQueues.get(lang);
+				boolean emitBlank = true;
+				while(queue != null && !queue.isEmpty()){
+					if(emitBlank){
+						System.out.println("Emit blank " + lang);
+						this.collector.emit(Top3App.STREAM_MANAGER_TO_SUBRANK,new Values(lang,"",null)); //Emit blank tuple (change).
+						emitBlank = false;
+					}
+					Values tuple = queue.poll();
+					System.out.println("EmitAll!!! : " + tuple + ", " + ts);
+					this.collector.emit(Top3App.STREAM_MANAGER_TO_SUBRANK,tuple);
+				}
+				langQueues.remove(lang);
 			}
-			langQueues.remove(lang);
 			if (langQueues.isEmpty()){
 				this.timeWindowsTuples.remove(ts);
 			}
@@ -108,6 +122,7 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 	}
 	
 	private void keepFutureTuple(Long ts, String lang,Values tuple){
+		System.out.println("Keep!!! : " + tuple + ", " + ts);
 		HashMap<String,Queue<Values>> langQueues = this.timeWindowsTuples.get(ts);
 		if(langQueues == null){
 			langQueues = new HashMap<String,Queue<Values>>();
@@ -141,7 +156,8 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("language","hashtag","timewindow"));
+		declarer.declareStream(Top3App.STREAM_MANAGER_TO_RANK, new Fields("timewindow","count"));
+		declarer.declareStream(Top3App.STREAM_MANAGER_TO_SUBRANK, new Fields("language","hashtag","timewindow"));
 	}
 
 }
