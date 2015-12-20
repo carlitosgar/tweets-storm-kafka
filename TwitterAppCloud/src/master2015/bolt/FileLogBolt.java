@@ -45,7 +45,7 @@ public class FileLogBolt extends BaseRichBolt {
 			
 			if(writer == null) {
 				try {
-					writer = new PrintWriter(lang+"_02.log", "UTF-8");
+					writer = new PrintWriter(Top3App.LOG_PATH + lang +"_02.log", "UTF-8");
 				} catch (FileNotFoundException | UnsupportedEncodingException e) {
 					e.printStackTrace();
 					return;

@@ -1,5 +1,6 @@
 package master2015;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +42,8 @@ public class Top3App {
 	public static final int SUBRANK_PARALLELISM = 1;
 	public static final int FINAL_RANK_PARALLELISM = 1; 
 	public static final int FILE_LOGER_PARALLELISM = 1; //Should not be greater than the number of languages
+	
+	public static String LOG_PATH = "";
 
 	public Top3App() {
 		// TODO Auto-generated constructor stub
@@ -48,7 +51,7 @@ public class Top3App {
 
 	public static void main(String[] args) throws InterruptedException {
 		
-		if(args.length < 1) {
+		if(args.length < 5) {
 			System.err.println("Invalid parameters");
 			return;
 		}
@@ -61,8 +64,19 @@ public class Top3App {
 			for(String lang:langs){
 				languages.add(lang);
 			}
-		}else{
+		} else {
 			languages.add(args[0]);
+		}
+		
+		//Topology name
+		String topologyName = args[3];
+		
+		//Set the log path
+		LOG_PATH = (args[4].endsWith(File.separator) ? args[4] : File.separator + args[4]);
+		File path = new File(LOG_PATH);
+		if(!path.exists() || !path.isDirectory() || !path.canWrite()) {
+			System.err.println("Log directory is not writable");
+			return;
 		}
 		
 		//Config time window.
@@ -109,10 +123,10 @@ public class Top3App {
 		Config conf = new Config();
 		conf.setNumAckers(0);
 		LocalCluster cluster = new LocalCluster();
-	    cluster.submitTopology("test", conf, builder.createTopology());
+	    cluster.submitTopology(topologyName, conf, builder.createTopology());
 	    //Set topology life-cycle.
 	    Thread.sleep((long) 10000);
-	    cluster.killTopology("test");
+	    cluster.killTopology(topologyName);
 	    cluster.shutdown();
 	}
 
