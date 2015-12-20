@@ -32,13 +32,7 @@ public class TimeWindow implements Comparable<TimeWindow> {
 	public static List<TimeWindow> getAllTimeWindow(String language, Long timestamp){
 		List<TimeWindow> tws = new ArrayList<TimeWindow>();
 		Long currentTs = timestamp / 1000L;
-		Long window = (long) TimeWindow.size;
-		/*while(!(currentTs < window)){
-			window += TimeWindow.advance;
-		}*/
-		if (!(currentTs < window)){
-			window += (long) (((currentTs - window) / TimeWindow.advance) + 1) * TimeWindow.advance;;
-		}
+		Long window = getFirstTimeWindowTime(currentTs);
 		Long prevWindow = window - TimeWindow.size;
 		int nAdvances = (int) Math.floor((currentTs - prevWindow) / TimeWindow.advance);
 		TimeWindow tw;
@@ -73,25 +67,6 @@ public class TimeWindow implements Comparable<TimeWindow> {
 		}
 		
 	}
-	
-	/* 
-	 public static Long getFirstTimeWindowTime(Long timestamp) {
-		int windowNumber;
-		
-		if(timestamp < TimeWindow.advance) {
-			windowNumber = 1; //First window
-		} else {
-			Long lowerMultiple = timestamp - (timestamp % TimeWindow.advance);
-			int dif = TimeWindow.size - TimeWindow.advance;
-			windowNumber = (int) (lowerMultiple / TimeWindow.advance);
-			if(timestamp - lowerMultiple >= dif) {
-				windowNumber++;
-			}
-		}
-		
-		return (long) ((windowNumber - 1) * TimeWindow.advance) + TimeWindow.size;
-	}
-	  */
 	
 	public String getLanguage() {
 		return language;
