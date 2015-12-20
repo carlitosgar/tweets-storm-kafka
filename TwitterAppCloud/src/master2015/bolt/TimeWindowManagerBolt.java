@@ -52,7 +52,7 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 		Long tsWindow = tws.get(0).getTimestamp();
 		TimeWindow tw;
 		Values tuple;
-		
+		System.out.println("TimeManager");
 		if (this.isFirstWindow()){ // First tuple
 			this.window = tsWindow;
 		} else if (!this.isSameWindow(tsWindow)){ // Change of time window
@@ -64,7 +64,7 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 			}
 			this.window = tsWindow;
 		}
-		
+		System.out.println("Process tuple");
 		// Process all time-windows for tuple.
 		Iterator<TimeWindow> it = tws.iterator();
 		while(it.hasNext()){
@@ -74,8 +74,9 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 			tuple = new Values(lang,ht,tw);
 			
 			//Increment the tuple count
+			System.out.println("IncCountInit");
 			incrementTimeWindowCount(tw);
-			
+			System.out.println("IncCountEnd");
 			if (this.isSameWindow(tsWindow)){
 				System.out.println("Emit!!! : " + tuple + ", " + tsWindow);
 				this.collector.emit(Top3App.STREAM_MANAGER_TO_SUBRANK,tuple);

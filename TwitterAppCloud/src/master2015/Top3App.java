@@ -105,7 +105,7 @@ public class Top3App {
 		
 		//Subrank
 		builder.setBolt(SUBRANK_BOLT, new SubRankBolt())
-			.fieldsGrouping(TIME_MANAGER_BOLT, new Fields("language","hashtag"));
+			.fieldsGrouping(TIME_MANAGER_BOLT, STREAM_MANAGER_TO_SUBRANK, new Fields("language","hashtag"));
 
 		/*//Final Rank
 		builder.setBolt(FINAL_RANK_BOLT, new FinalRankBolt(),FINAL_RANK_PARALLELISM)
