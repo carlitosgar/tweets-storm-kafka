@@ -1,10 +1,7 @@
 package master2015.bolt;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -12,8 +9,6 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-import backtype.storm.tuple.Values;
-import master.structures.Tweet;
 import master2015.Top3App;
 import master2015.structures.HashtagRank;
 import master2015.structures.HashtagRankEntry;
@@ -50,10 +45,16 @@ public class SubRankBolt extends BaseRichBolt {
 		String ht = (String) input.getValueByField("hashtag");
 		TimeWindow tw = (TimeWindow) input.getValueByField("timewindow");
 		HashtagRankEntry newEntry = new HashtagRankEntry(lang, ht, 1);
-		TimeWindow timeWindow = this.timeWindows.put(lang, tw);
-		if(timeWindow != null && !timeWindow.equals(tw)){
+		//Check blank tuple.
+		/*if(timeWindow != null && !timeWindow.equals(tw)){
 			this.emitSubRankAndUpdate(lang, timeWindow, newEntry);
 		} else {
+			this.updateRanking(lang, newEntry);
+		}*/
+		if(tw == null){
+			this.emitSubRank(lang);
+		} else {
+			this.timeWindows.put(lang, tw);
 			this.updateRanking(lang, newEntry);
 		}
 	}
@@ -69,15 +70,18 @@ public class SubRankBolt extends BaseRichBolt {
 		}
 	}
 	
-	private void emitSubRankAndUpdate(String lang, TimeWindow tw, HashtagRankEntry entry){
+	private void emitSubRank(String lang){
 		HashtagRank subRank = this.subRanks.get(lang);
+		TimeWindow tw = this.timeWindows.get(lang);
 		SubRankTupleValues tuple = new SubRankTupleValues(
 				tw,
 				subRank.getBestN(Top3App.RANK_NUMBER),
 				this.totalTweetsProcessed(subRank));
+		System.out.println(tw.getLanguage()+", "+tw.getTimestamp());
+		System.out.println(tuple);
 		this.collector.emit(tuple);
 		subRank.clear();
-		this.updateRanking(lang, entry);
+		//this.updateRanking(lang, entry);
 	}
 	
 	private int totalTweetsProcessed(HashtagRank subRank){

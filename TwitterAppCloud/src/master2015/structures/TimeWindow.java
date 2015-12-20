@@ -33,8 +33,11 @@ public class TimeWindow implements Comparable<TimeWindow> {
 		List<TimeWindow> tws = new ArrayList<TimeWindow>();
 		Long currentTs = timestamp / 1000L;
 		Long window = (long) TimeWindow.size;
-		while(!(currentTs < window)){
+		/*while(!(currentTs < window)){
 			window += TimeWindow.advance;
+		}*/
+		if (!(currentTs < window)){
+			window += (long) (((currentTs - window) / TimeWindow.advance) + 1) * TimeWindow.advance;;
 		}
 		Long prevWindow = window - TimeWindow.size;
 		int nAdvances = (int) Math.floor((currentTs - prevWindow) / TimeWindow.advance);

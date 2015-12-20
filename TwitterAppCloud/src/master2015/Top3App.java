@@ -107,6 +107,7 @@ public class Top3App {
 
 		//Config topology.
 		Config conf = new Config();
+		conf.setNumAckers(0);
 		LocalCluster cluster = new LocalCluster();
 	    cluster.submitTopology("test", conf, builder.createTopology());
 	    //Set topology life-cycle.
