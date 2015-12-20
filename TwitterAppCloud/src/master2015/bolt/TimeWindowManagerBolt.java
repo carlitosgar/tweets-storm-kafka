@@ -1,5 +1,6 @@
 package master2015.bolt;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -53,7 +54,7 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 		String ht = (String) input.getValueByField("hashtag");
 		Long timestamp = (Long) input.getValueByField("timestamp");
 		
-		//TODO: behaviour in case of blank tuple
+		//TODO: behaviour in case of blank tuple: processBlankTuple()
 		
 		// Generate possible time windows.
 		List<TimeWindow> tws = TimeWindow.getAllTimeWindow(lang, timestamp);
@@ -68,10 +69,7 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 			this.emitTimeWindowTuples(tsWindow);
 
 			// Send totals for all the different TimeWindows of the old timestamp
-			for(TimeWindow timeWindow: this.uniqueTimeWindows.get(this.window)) {
-				this.sendTimeWindowCount(timeWindow);
-			}
-			this.uniqueTimeWindows.remove(this.window);
+			this.sendAllCountsOfTimestamp(this.window);
 			
 			// Set the new window
 			this.window = tsWindow;
@@ -96,12 +94,37 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 
 	}
 	
+	private void processBlankTuple() {
+		
+		//Get and sort in ascending order all the pending timestamps
+		Long[] timestamps = this.uniqueTimeWindows.keySet().toArray(new Long[0]);
+		Arrays.sort(timestamps);
+		
+		//Send all pendieng tuples and count per each timestamp
+		for(Long timestamp : timestamps) {
+			this.emitTimeWindowTuples(timestamp);
+			this.sendAllCountsOfTimestamp(timestamp);
+		}
+		
+	}
+	
 	private boolean isFirstWindow(){
 		return this.window.equals(0L);
 	}
 	
 	private boolean isSameWindow(Long ts){
 		return ts.equals(this.window);
+	}
+	
+	/**
+	 * 
+	 * @param timestamp
+	 */
+	private void sendAllCountsOfTimestamp(Long timestamp) {
+		for(TimeWindow timeWindow: this.uniqueTimeWindows.get(timestamp)) {
+			this.sendTimeWindowCount(timeWindow);
+		}
+		this.uniqueTimeWindows.remove(timestamp);
 	}
 	
 	/**
