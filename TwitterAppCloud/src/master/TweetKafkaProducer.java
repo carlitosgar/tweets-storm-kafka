@@ -23,15 +23,21 @@ public class TweetKafkaProducer{
 	private static Encoder<Tweet> tweetEncoder = new TweetEncoder(null);
 	private static KafkaProducer<String, byte[]> producer;
 	
-	public TweetKafkaProducer (String topic){
+	public TweetKafkaProducer (String topic, String kafkaUrl){
 		this.topic = topic;
-		InputStream in = null;
 		try {
-			in = new FileInputStream("src/master/producer.properties");
+			
+			//Load configuration from file
+			InputStream in = new FileInputStream("src/master/producer.properties");
 			this.props.load(in);
+			
+			//Kafka url
+			this.props.put("bootstrap.servers", kafkaUrl);
+			
 		} catch(IOException e){
 			System.out.println(e.toString());
 		}
+		
 		producer = new KafkaProducer<String, byte[]>(props);
 	}
 	
