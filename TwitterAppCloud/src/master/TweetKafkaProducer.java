@@ -85,7 +85,7 @@ public class TweetKafkaProducer{
 	}
 
 	public void sendBlankTuple() {
-		Tweet blankTweet = new Tweet(null, null, null);
+		Tweet blankTweet = new Tweet("0", null, null);
 		byte[] bytesTweet = tweetEncoder.toBytes(blankTweet);
 		ProducerRecord<String, byte[]> msg = new ProducerRecord<String, byte[]>(this.topic, "",bytesTweet);
 		producer.send(msg);

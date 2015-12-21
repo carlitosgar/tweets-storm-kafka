@@ -25,7 +25,7 @@ public class HashtagSplitBolt extends BaseRichBolt{
 	@Override
 	public void execute(Tuple input) {
 		
-		if(input.getValueByField("hashtags") != null) {
+		if(input.getValueByField("language") != null) {
 			List<String> hashtags = (List<String>) input.getValueByField("hashtags");
 			for(String ht : hashtags){
 				collector.emit(new Values(

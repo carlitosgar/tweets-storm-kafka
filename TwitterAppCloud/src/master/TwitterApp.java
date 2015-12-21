@@ -30,7 +30,7 @@ public class TwitterApp {
 				return;
 			}
 			
-			kafkaUrl = args[5];
+			kafkaUrl = args[1];
 			
 			break;
 			
