@@ -30,7 +30,7 @@ public class SubRankBolt extends BaseRichBolt {
 	
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("timewindow","subrank","count"));
+		declarer.declareStream(Top3App.STREAM_SUBRANK_TO_RANK, new Fields("timewindow","subrank","count"));
 	}
 	
 	@Override
@@ -75,7 +75,7 @@ public class SubRankBolt extends BaseRichBolt {
 				this.totalTweetsProcessed(subRank));
 		System.out.println(tw.getLanguage()+", "+tw.getTimestamp());
 		System.out.println(tuple);
-		this.collector.emit(tuple);
+		this.collector.emit(Top3App.STREAM_SUBRANK_TO_RANK, tuple);
 		subRank.clear();
 	}
 	

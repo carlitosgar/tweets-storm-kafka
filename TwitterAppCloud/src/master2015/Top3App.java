@@ -109,7 +109,7 @@ public class Top3App {
 
 		//Final Rank
 		builder.setBolt(FINAL_RANK_BOLT, new FinalRankBolt(),FINAL_RANK_PARALLELISM)
-			.globalGrouping(SUBRANK_BOLT)
+			.globalGrouping(SUBRANK_BOLT, STREAM_SUBRANK_TO_RANK)
 			.globalGrouping(TIME_MANAGER_BOLT, STREAM_MANAGER_TO_RANK);
 		
 		//File loger
