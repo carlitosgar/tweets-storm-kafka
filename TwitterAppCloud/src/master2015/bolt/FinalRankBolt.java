@@ -1,5 +1,6 @@
 package master2015.bolt;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -25,21 +26,21 @@ public class FinalRankBolt extends BaseRichBolt {
 	private OutputCollector collector;
 	
 	/**
-	 * SortedMap that contains timeWindows as keys, and the total of tweets in that time window as values.
+	 * HashMap that contains timeWindows as keys, and the total of tweets in that time window as values.
 	 */
-	private SortedMap<TimeWindow, Integer> totals = new TreeMap<TimeWindow, Integer>();
+	private HashMap<TimeWindow, Integer> totals = new HashMap<TimeWindow, Integer>();
 	
 	/**
-	 * SortedMap that contains timeWindows as keys, and the current count of received tweets in 
+	 * HashMap that contains timeWindows as keys, and the current count of received tweets in 
 	 * that time window.
 	 */
-	private SortedMap<TimeWindow, Integer> counts = new TreeMap<TimeWindow, Integer>();
+	private HashMap<TimeWindow, Integer> counts = new HashMap<TimeWindow, Integer>();
 	
 	/**
-	 * SortedMap that contains all the ranks that are pending to be logged because not all the SubRanks have
+	 * HashMap that contains all the ranks that are pending to be logged because not all the SubRanks have
 	 * been received
 	 */
-	private SortedMap<TimeWindow, HashtagRank> pendingRanks = new TreeMap<TimeWindow, HashtagRank>();
+	private HashMap<TimeWindow, HashtagRank> pendingRanks = new HashMap<TimeWindow, HashtagRank>();
 	
 
 	public FinalRankBolt() {
