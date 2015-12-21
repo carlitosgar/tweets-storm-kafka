@@ -42,18 +42,14 @@ public class SubRankBolt extends BaseRichBolt {
 	@Override
 	public void execute(Tuple input) {
 		String lang = (String) input.getValueByField("language");
-		String ht = (String) input.getValueByField("hashtag");
 		TimeWindow tw = (TimeWindow) input.getValueByField("timewindow");
-		HashtagRankEntry newEntry = new HashtagRankEntry(lang, ht, 1);
+		String ht = (String) input.getValueByField("hashtag");;
+		HashtagRankEntry newEntry;
 		//Check blank tuple.
-		/*if(timeWindow != null && !timeWindow.equals(tw)){
-			this.emitSubRankAndUpdate(lang, timeWindow, newEntry);
-		} else {
-			this.updateRanking(lang, newEntry);
-		}*/
-		if(tw == null){
+		if(ht == null){
 			this.emitSubRank(lang);
 		} else {
+			newEntry = new HashtagRankEntry(lang, ht, 1);
 			this.timeWindows.put(lang, tw);
 			this.updateRanking(lang, newEntry);
 		}
@@ -81,7 +77,6 @@ public class SubRankBolt extends BaseRichBolt {
 		System.out.println(tuple);
 		this.collector.emit(tuple);
 		subRank.clear();
-		//this.updateRanking(lang, entry);
 	}
 	
 	private int totalTweetsProcessed(HashtagRank subRank){

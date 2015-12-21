@@ -30,13 +30,13 @@ public class TwitterApp {
 				return;
 			}
 			
-			kafkaUrl = args[1];
+			kafkaUrl = args[5];
 			
 			break;
 			
 		case "2": //Read from twitter
 			provider = new TwitterTweetProvider(args[1], args[2], args[3], args[4]);
-			kafkaUrl = args[1];
+			kafkaUrl = args[5];
 			break;
 			
 		default: 

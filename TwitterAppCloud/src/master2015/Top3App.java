@@ -107,9 +107,9 @@ public class Top3App {
 		builder.setBolt(SUBRANK_BOLT, new SubRankBolt())
 			.fieldsGrouping(TIME_MANAGER_BOLT, STREAM_MANAGER_TO_SUBRANK, new Fields("language","hashtag"));
 
-		/*//Final Rank
+		//Final Rank
 		builder.setBolt(FINAL_RANK_BOLT, new FinalRankBolt(),FINAL_RANK_PARALLELISM)
-			.globalGrouping(SUBRANK_BOLT, STREAM_SUBRANK_TO_RANK)
+			.globalGrouping(SUBRANK_BOLT)
 			.globalGrouping(TIME_MANAGER_BOLT, STREAM_MANAGER_TO_RANK);
 		
 		//File loger
@@ -117,9 +117,9 @@ public class Top3App {
 			.fieldsGrouping(FINAL_RANK_BOLT, STREAM_RANK_TO_LOGERS, new Fields(RankTupleValues.FIELD_LANGUAGE));
 				
 		//Printer.
-		builder.setBolt("printer", new LogBolt())
-			.shuffleGrouping(SUBRANK_BOLT);
-*/
+		/*builder.setBolt("printer", new LogBolt())
+			.shuffleGrouping(SUBRANK_BOLT);*/
+
 		//Config topology.
 		Config conf = new Config();
 		conf.setNumAckers(0);
