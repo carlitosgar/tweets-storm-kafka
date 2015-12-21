@@ -53,7 +53,7 @@ public class TweetKafkaProducer{
 		//if(ts >= currentTs){ // Discard if doesen't belong to current window.
 			//tweet.setTimestamp(ts);
 			bytesTweet = tweetEncoder.toBytes(tweet);
-			msg = new ProducerRecord<String, byte[]>(this.topic,tweet.getLanguage(),bytesTweet);
+			msg = new ProducerRecord<String, byte[]>(this.topic, tweet.getLanguage(), bytesTweet);
 			producer.send(msg);
 			//currentTs = ts;
 		//}
@@ -82,6 +82,13 @@ public class TweetKafkaProducer{
 	
 	public void close(){
 		producer.close();
+	}
+
+	public void sendBlankTuple() {
+		Tweet blankTweet = new Tweet(null, null, null);
+		byte[] bytesTweet = tweetEncoder.toBytes(blankTweet);
+		ProducerRecord<String, byte[]> msg = new ProducerRecord<String, byte[]>(this.topic, "",bytesTweet);
+		producer.send(msg);
 	}
 	
 }

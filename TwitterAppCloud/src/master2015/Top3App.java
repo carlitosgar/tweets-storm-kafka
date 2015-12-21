@@ -101,7 +101,7 @@ public class Top3App {
 
 		//Time manager 
 		builder.setBolt(TIME_MANAGER_BOLT, new TimeWindowManagerBolt())
-        	.shuffleGrouping(HASHTAG_SPLIT_BOLT);
+        	.fieldsGrouping(HASHTAG_SPLIT_BOLT, new Fields("language"));
 		
 		//Subrank
 		builder.setBolt(SUBRANK_BOLT, new SubRankBolt())

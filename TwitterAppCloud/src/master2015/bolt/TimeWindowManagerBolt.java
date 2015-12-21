@@ -50,11 +50,39 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 
 	@Override
 	public void execute(Tuple input) {
+		
+		if(this.isBlankTuple(input)) {
+			processBlankTuple();
+		} else {
+			processHashtagTuple(input);
+		}
+
+	}
+	
+	private boolean isBlankTuple(Tuple input) {
+		return input.getValueByField("language") == null;
+	}
+	
+	private void processBlankTuple() {
+		System.out.println("Blank tuple!!");
+		//Get and sort in ascending order all the pending timestamps
+		Long[] timestamps = this.uniqueTimeWindows.keySet().toArray(new Long[0]);
+		Arrays.sort(timestamps);
+		
+		//Send all pending tuples and count per each timestamp
+		for(Long timestamp : timestamps) {
+			this.sendBlankTuplesForTimestamp(timestamp);
+			this.emitTimeWindowTuples(timestamp);
+			this.sendAllCountsOfTimestamp(timestamp);
+		}
+		
+	}
+	
+	private void processHashtagTuple(Tuple input) {
+		
 		String lang = (String) input.getValueByField("language");
 		String ht = (String) input.getValueByField("hashtag");
 		Long timestamp = (Long) input.getValueByField("timestamp");
-		
-		//TODO: behaviour in case of blank tuple: processBlankTuple()
 		
 		// Generate possible time windows.
 		List<TimeWindow> tws = TimeWindow.getAllTimeWindow(lang, timestamp);
@@ -64,6 +92,9 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 			this.window = tsWindow;
 			
 		} else if (!this.isSameWindow(tsWindow)){ // Change of time window
+			
+			//Send blank tuples for all the languages of the old timestamp
+			this.sendBlankTuplesForTimestamp(this.window);
 
 			// Emit all the queued tuples for the new window
 			this.emitTimeWindowTuples(tsWindow);
@@ -91,20 +122,6 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 				this.keepFutureTuple(tsWindow, lang, tuple);
 			}
 		}
-
-	}
-	
-	private void processBlankTuple() {
-		
-		//Get and sort in ascending order all the pending timestamps
-		Long[] timestamps = this.uniqueTimeWindows.keySet().toArray(new Long[0]);
-		Arrays.sort(timestamps);
-		
-		//Send all pendieng tuples and count per each timestamp
-		for(Long timestamp : timestamps) {
-			this.emitTimeWindowTuples(timestamp);
-			this.sendAllCountsOfTimestamp(timestamp);
-		}
 		
 	}
 	
@@ -117,7 +134,7 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 	}
 	
 	/**
-	 * 
+	 * Note: this method removes the content of uniqueTimeWindows.
 	 * @param timestamp
 	 */
 	private void sendAllCountsOfTimestamp(Long timestamp) {
@@ -125,6 +142,17 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 			this.sendTimeWindowCount(timeWindow);
 		}
 		this.uniqueTimeWindows.remove(timestamp);
+	}
+	
+	private void sendBlankTuplesForTimestamp(Long timestamp) {
+		for(TimeWindow timeWindow: this.uniqueTimeWindows.get(timestamp)) {
+			System.out.println("Emit Blank!!! : " + timeWindow );
+			this.emitBlankTuple(timeWindow);
+		}
+	}
+	
+	private void emitBlankTuple(TimeWindow timeWindow) {
+		this.collector.emit(Top3App.STREAM_MANAGER_TO_SUBRANK,new Values(timeWindow.getLanguage(),null,timeWindow));
 	}
 	
 	/**
@@ -174,7 +202,9 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 			}
 			
 			// Add it to the list of TimeWindows for that timestamp
-			windowSet.add(tw);
+			if(!windowSet.contains(tw)) {
+				windowSet.add(tw);
+			}
 			
 			// Initialize the count
 			this.tuplesCount.put(tw, 1);
