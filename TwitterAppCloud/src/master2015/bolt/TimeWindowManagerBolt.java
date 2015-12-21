@@ -69,7 +69,13 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 	private void processBlankTuple() {
 		System.out.println("Blank tuple!!");
 		
-		//Send all pending tuples and count per each timestamp
+		// Send blank tuples for the current window
+		this.sendBlankTuplesForTimestamp(this.window);
+
+		// Send the count of the current window
+		this.sendAllCountsOfTimestamp(this.window);
+		
+		//Send all pending tuples and count per each timestamp of the next windows that are still queued
 		Iterator<Long> timeIt = this.timeWindowsTuples.keySet().iterator();
 		while(timeIt.hasNext()) {
 			
