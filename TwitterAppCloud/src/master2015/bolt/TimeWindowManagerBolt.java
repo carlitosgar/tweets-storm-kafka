@@ -210,10 +210,10 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 			queue = new LinkedList<Values>();
 			this.timeWindowsTuples.put(ts, queue);
 		}
+		queue.add(tuple);
 	}
 	
 	private void incrementTimeWindowCount(TimeWindow tw) {
-		
 		Integer count = this.tuplesCount.get(tw);
 		
 		if(count != null) {
@@ -237,6 +237,7 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 			// Initialize the count
 			this.tuplesCount.put(tw, 1);
 		}
+		
 		
 	}
 	

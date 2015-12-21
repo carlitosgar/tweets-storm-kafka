@@ -73,7 +73,7 @@ public class SubRankBolt extends BaseRichBolt {
 				tw,
 				subRank.getBestN(Top3App.RANK_NUMBER),
 				this.totalTweetsProcessed(subRank));
-		System.out.println(tw.getLanguage()+", "+tw.getTimestamp());
+		System.out.println(tw.getLanguage()+", "+tw.getTimestamp() + ", " + this.totalTweetsProcessed(subRank));
 		System.out.println(tuple);
 		this.collector.emit(Top3App.STREAM_SUBRANK_TO_RANK, tuple);
 		subRank.clear();
