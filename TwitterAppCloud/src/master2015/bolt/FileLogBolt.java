@@ -54,6 +54,7 @@ public class FileLogBolt extends BaseRichBolt {
 			}
 			
 			writer.println(getLogTextFromTuple(tupleVals));
+			writer.flush();
 			
 			
 		} else {
