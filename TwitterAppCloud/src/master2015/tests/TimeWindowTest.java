@@ -3,6 +3,7 @@ package master2015.tests;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.junit.Before;
@@ -52,6 +53,39 @@ public class TimeWindowTest {
 		tw = TimeWindow.getFirstTimeWindowTime(ts);
 		assertTrue(twFinal.equals(tw));		
 	}*/
+	
+	@Test
+	public void TimeWindow_equals() {
+		TimeWindow tw1 = new TimeWindow("es", 1450526000L);
+		TimeWindow tw2 = new TimeWindow("es", 1450526000L);
+		assertEquals(tw1, tw2);
+	}
+	
+	@Test
+	public void TimeWindow_not_equals() {
+		TimeWindow tw1 = new TimeWindow("es", 1450526000L);
+		TimeWindow tw2 = new TimeWindow("en", 1450526000L);
+		assertNotEquals(tw1, tw2);
+	}
+	
+	@Test
+	public void TimeWindow_should_retrieve_from_hashmap() {
+		TimeWindow tw1 = new TimeWindow("es", 1450526000L);
+		HashMap<TimeWindow, Integer> m = new HashMap<TimeWindow, Integer>();
+		m.put(tw1, 1);
+		assertTrue(m.containsKey(tw1));
+		assertNotNull(m.get(tw1));
+	}
+	
+	@Test
+	public void TimeWindow_should_not_retrieve_from_hashmap() {
+		TimeWindow tw1 = new TimeWindow("es", 1450526000L);
+		TimeWindow tw2 = new TimeWindow("en", 1450526000L);
+		HashMap<TimeWindow, Integer> m = new HashMap<TimeWindow, Integer>();
+		m.put(tw1, 1);
+		assertFalse(m.containsKey(tw2));
+		assertNull(m.get(tw2));
+	}
 	
 	@Test
 	public void GetTimeWindow_SameSizeAdvance_FirstTs() {

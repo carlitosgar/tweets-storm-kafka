@@ -98,7 +98,7 @@ public class FinalRankBolt extends BaseRichBolt {
 			List<HashtagRankEntry> subRank = tupleVals.getRank();
 			int tweetsInSubRank = tupleVals.getRankContentTweetCount();
 			int newCount;
-			
+			System.out.println("[FinalRank] Received tuple " + timeWindow + " with count " + tweetsInSubRank);
 			
 			HashtagRank rank = this.pendingRanks.get(timeWindow);
 			
@@ -123,7 +123,7 @@ public class FinalRankBolt extends BaseRichBolt {
 			for(HashtagRankEntry entry : subRank) {
 				rank.add(entry);
 			}
-			
+			System.out.println("[FinalRank] Count: " + newCount);
 			//Set the count value to the number of tweets inside the subrank
 			this.counts.put(timeWindow, newCount);
 			

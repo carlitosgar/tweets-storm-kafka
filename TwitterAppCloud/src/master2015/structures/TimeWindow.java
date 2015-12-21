@@ -78,15 +78,22 @@ public class TimeWindow implements Comparable<TimeWindow> {
 
 	@Override
 	public int compareTo(TimeWindow o) {
-		return this.timestamp.compareTo(o.getTimestamp());
+		if(!(this.timestamp.equals(o.getTimestamp()))) {
+			return this.timestamp.compareTo(o.getTimestamp());
+		} else {
+			return this.language.compareTo(o.getLanguage());
+		}
+		
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
 		
-		if(!obj.getClass().equals(this.getClass())) {
+		if(obj == null)
 			return false;
-		}
+		
+	    if(!(obj instanceof TimeWindow))
+	    	return false;
 		
 		TimeWindow o = (TimeWindow) obj;
 		
@@ -100,7 +107,8 @@ public class TimeWindow implements Comparable<TimeWindow> {
 	
 	@Override
 	public int hashCode() {
-		// TODO Auto-generated method stub
-		return this.language.hashCode() + this.timestamp.hashCode();
+		return this.language.hashCode() * this.timestamp.hashCode();
 	}
+	
+	
 }
