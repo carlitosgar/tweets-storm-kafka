@@ -3,10 +3,13 @@ package master2015.bolt;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Queue;
+import java.util.TreeMap;
 
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -22,7 +25,7 @@ import master2015.structures.tuple.TotalTupleValues;
 public class TimeWindowManagerBolt extends BaseRichBolt{
 
 	private static final long serialVersionUID = -1078494623581520582L;
-	private HashMap<Long, Queue<Values>> timeWindowsTuples;
+	private TreeMap<Long, Queue<Values>> timeWindowsTuples;
 	
 	/**
 	 * This hashmap contains the list of unique TimeWindows received per window timestamp
@@ -38,7 +41,7 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 	private Long window;
 	
 	public TimeWindowManagerBolt(){
-		this.timeWindowsTuples = new HashMap<Long, Queue<Values>>();
+		this.timeWindowsTuples = new TreeMap<Long, Queue<Values>>();
 		this.window = 0L;
 	}
 	
@@ -65,15 +68,20 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 	
 	private void processBlankTuple() {
 		System.out.println("Blank tuple!!");
-		//Get and sort in ascending order all the pending timestamps
-		Long[] timestamps = this.uniqueTimeWindows.keySet().toArray(new Long[0]);
-		Arrays.sort(timestamps);
 		
 		//Send all pending tuples and count per each timestamp
-		for(Long timestamp : timestamps) {
-			this.sendBlankTuplesForTimestamp(timestamp);
-			this.emitTimeWindowTuples(timestamp);
-			this.sendAllCountsOfTimestamp(timestamp);
+		Iterator<Long> timeIt = this.timeWindowsTuples.keySet().iterator();
+		while(timeIt.hasNext()) {
+			
+			Long time = timeIt.next();
+			
+			this.sendBlankTuplesForTimestamp(time);
+			this.emitTimeWindowTuples(time);
+			this.sendAllCountsOfTimestamp(time);
+
+			//Remove the element from the timeWindowsTuples tree
+			timeIt.remove();
+			
 		}
 		
 	}
@@ -92,16 +100,37 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 			this.window = tsWindow;
 			
 		} else if (!this.isSameWindow(tsWindow)){ // Change of time window
-			
+						
 			//Send blank tuples for all the languages of the old timestamp
 			this.sendBlankTuplesForTimestamp(this.window);
-
-			// Emit all the queued tuples for the new window
-			this.emitTimeWindowTuples(tsWindow);
-
+			
 			// Send totals for all the different TimeWindows of the old timestamp
 			this.sendAllCountsOfTimestamp(this.window);
 			
+			// Send tuples from previous timestamps
+			NavigableMap<Long, Queue<Values>> previous = this.timeWindowsTuples.headMap(tsWindow, false);
+			Iterator<Long> timeIt = previous.keySet().iterator();
+			while(timeIt.hasNext()) {
+				
+				Long time = timeIt.next();
+				
+				// Emit all the queued tuples for the new window
+				this.emitTimeWindowTuples(time);
+				
+				// Send blank tuples
+				this.sendBlankTuplesForTimestamp(time);
+				
+				// Send totals for all the different TimeWindows of the old timestamp
+				this.sendAllCountsOfTimestamp(time);
+
+				//Remove the element from the timeWindowsTuples tree
+				timeIt.remove();
+				
+			}
+			
+			// Emit all the queued tuples for the new window
+			this.emitTimeWindowTuples(tsWindow);
+
 			// Set the new window
 			this.window = tsWindow;
 			
@@ -170,7 +199,6 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 			
 			// Free memory
 			queue.clear();
-			this.timeWindowsTuples.remove(ts);
 			
 		}
 	}
@@ -215,6 +243,7 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 	private void sendTimeWindowCount(TimeWindow tw) {
 		Integer count = this.tuplesCount.remove(tw);
 		if(count != null) {
+			System.out.println("Sent total count for window " + tw + ": " + count);
 			this.collector.emit(Top3App.STREAM_MANAGER_TO_RANK, new TotalTupleValues(tw, count));
 		}
 	}

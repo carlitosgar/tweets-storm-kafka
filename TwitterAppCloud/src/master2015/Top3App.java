@@ -32,7 +32,6 @@ public class Top3App {
 	public static final String LOGER_BOLT = "printer";
 	public static final String TIME_MANAGER_BOLT = "timemanager";
 	
-	public static final String STREAM_TOTALS_SPOUT_TO_RANK = "totalstorank";
 	public static final String STREAM_SUBRANK_TO_RANK = "subranktorank";
 	public static final String STREAM_RANK_TO_LOGERS = "ranktologers";
 	public static final String STREAM_MANAGER_TO_RANK = "managertorank";

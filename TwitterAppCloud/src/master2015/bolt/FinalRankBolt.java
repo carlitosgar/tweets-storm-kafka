@@ -51,7 +51,8 @@ public class FinalRankBolt extends BaseRichBolt {
 		
 		switch(input.getSourceStreamId()) {
 		
-		case Top3App.STREAM_TOTALS_SPOUT_TO_RANK:
+		case Top3App.STREAM_MANAGER_TO_RANK:
+			System.out.println("Tralara");
 			processTotalTuple(input);
 			break;
 			
@@ -75,12 +76,12 @@ public class FinalRankBolt extends BaseRichBolt {
 			
 			TimeWindow timeWindow = tupleVals.getTimeWindow();
 			Integer total = tupleVals.getTotal();
-			
+			System.out.println("Received total count for window " + timeWindow + ": " + total);
 			// Set the total of tweets in that time window
 			this.totals.put(timeWindow, total);
 			
 			// If all the tweets have been processed, finalize
-			if(this.counts.get(timeWindow).equals(total)) {
+			if(this.counts.containsKey(timeWindow) && this.counts.get(timeWindow).equals(total)) {
 				finalizeTimeWindow(timeWindow, this.pendingRanks.get(timeWindow));
 			}
 		}
