@@ -52,7 +52,6 @@ public class FinalRankBolt extends BaseRichBolt {
 		switch(input.getSourceStreamId()) {
 		
 		case Top3App.STREAM_MANAGER_TO_RANK:
-			System.out.println("Tralara");
 			processTotalTuple(input);
 			break;
 			
@@ -129,7 +128,7 @@ public class FinalRankBolt extends BaseRichBolt {
 			this.counts.put(timeWindow, newCount);
 			
 			// If all the tweets have been processed, log the time window top and clean
-			if(this.totals.get(timeWindow).equals(newCount)) {
+			if(this.totals.containsKey(timeWindow) && this.totals.get(timeWindow).equals(newCount)) {
 				finalizeTimeWindow(timeWindow, rank);				
 			}
 			
@@ -140,13 +139,14 @@ public class FinalRankBolt extends BaseRichBolt {
 	private void finalizeTimeWindow(TimeWindow timeWindow, HashtagRank rank) {
 		
 		// Emit to logers
-		this.collector.emit(new RankTupleValues(timeWindow, rank.getBestN(Top3App.RANK_NUMBER)));
+		this.collector.emit(Top3App.STREAM_RANK_TO_LOGERS, 
+				new RankTupleValues(timeWindow, rank.getBestN(Top3App.RANK_NUMBER)));
 		
 		// Clean all the data that does not need to be stored after logging
 		this.counts.remove(timeWindow);
 		this.totals.remove(timeWindow);
 		this.pendingRanks.remove(timeWindow);
-		
+		System.out.println("[FinalRank] Finalized window " + timeWindow);
 	}
 
 	

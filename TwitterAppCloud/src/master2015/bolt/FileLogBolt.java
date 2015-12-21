@@ -34,7 +34,7 @@ public class FileLogBolt extends BaseRichBolt {
 
 	@Override
 	public void execute(Tuple input) {
-		
+		System.out.println("[FileLogBolt] Received tuple " + input);
 		RankTupleValues tupleVals = RankTupleValues.fromTuple(input);
 		
 		if(tupleVals != null) {
