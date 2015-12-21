@@ -35,7 +35,8 @@ public class LangBolt extends BaseRichBolt{
 
 	@Override
 	public void execute(Tuple input) {
-		if(this.languages.contains(input.getValueByField("language"))) {
+		
+		if(this.languages.contains(input.getValueByField("language")) || input.getValueByField("language") == null) {
 			this.collector.emit(input.getValues());
 		}
 	}

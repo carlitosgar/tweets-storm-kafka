@@ -51,6 +51,11 @@ public class TwitterApp {
 			System.out.println(tweet);
 			producer.publishMsg(tweet);
 		}
+		
+		//Send the final blank tuple
+		producer.sendBlankTuple();
+		
+		//Close kafka producer
 		producer.close();
 		
 	}

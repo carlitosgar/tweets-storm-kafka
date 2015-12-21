@@ -24,13 +24,21 @@ public class HashtagSplitBolt extends BaseRichBolt{
 	@SuppressWarnings("unchecked")
 	@Override
 	public void execute(Tuple input) {
-		List<String> hashtags = (List<String>) input.getValueByField("hashtags");
-		for(String ht : hashtags){
-			collector.emit(new Values(
-					input.getValueByField("language"),
-					ht,
-					input.getValueByField("timestamp")));
+		
+		if(input.getValueByField("hashtags") != null) {
+			List<String> hashtags = (List<String>) input.getValueByField("hashtags");
+			for(String ht : hashtags){
+				collector.emit(new Values(
+						input.getValueByField("language"),
+						ht,
+						input.getValueByField("timestamp")));
+			}
+			
+		} else { //Blank tuple
+			this.collector.emit(input.getValues());
 		}
+		
+		
 	}
 
 	@Override

@@ -97,4 +97,10 @@ public class TimeWindow implements Comparable<TimeWindow> {
 	public String toString() {
 		return "TimeWindow{"+this.language+","+this.timestamp+"}";
 	}
+	
+	@Override
+	public int hashCode() {
+		// TODO Auto-generated method stub
+		return this.language.hashCode() + this.timestamp.hashCode();
+	}
 }
