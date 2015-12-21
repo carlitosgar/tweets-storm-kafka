@@ -37,7 +37,7 @@ public class HashtagRank {
 		List<HashtagRankEntry> entries = new LinkedList<HashtagRankEntry>(this.hashMap.values());
 		
 		// Sort the entries
-		Collections.sort(entries, Collections.reverseOrder());
+		Collections.sort(entries);
 		
 		// Return the top n elements
 		return entries.subList(0, (n < this.size() ? n : this.size()));

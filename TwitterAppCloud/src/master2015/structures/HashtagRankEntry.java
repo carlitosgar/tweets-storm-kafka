@@ -14,9 +14,12 @@ public class HashtagRankEntry implements Comparable<HashtagRankEntry>{
 	}
 
 	@Override
+	/**
+	 * Order in descending count and then alphabetic order
+	 */
 	public int compareTo(HashtagRankEntry o) {
 		if(this.count != o.count) {
-			return this.count - o.count;
+			return o.count - this.count;
 		} else {
 			return this.hashtag.compareTo(o.hashtag);
 		}
