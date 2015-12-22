@@ -113,8 +113,7 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 		
 		// Generate possible time windows.
 		List<TimeWindow> tws = TimeWindow.getAllTimeWindow(lang, timestamp);
-		TimeWindow timeWindow = tws.get(0);
-		Long tsWindow = timeWindow.getTimestamp();
+		Long tsWindow = tws.get(0).getTimestamp();
 		
 		Long window = this.timestampsPerLanguage.get(lang);
 		
@@ -123,14 +122,16 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 			window = tsWindow;
 			
 		} else if (window < tsWindow){// Change of time window
+			
+			TimeWindow currentTimeWindow = new TimeWindow(lang, window);
 						
 			//Send blank tuples for all the languages of the old timestamp
-			this.sendBlankTupleForTimeWindow(timeWindow);
+			this.sendBlankTupleForTimeWindow(currentTimeWindow);
 			
 			// Send totals for all the different TimeWindows of the old timestamp
-			this.sendCountOfTimeWindow(timeWindow);
+			this.sendCountOfTimeWindow(currentTimeWindow);
 			
-			this.removeTuplesOfTimeWindow(timeWindow, null);
+			this.removeTuplesOfTimeWindow(currentTimeWindow, null);
 			
 			// Send tuples from previous timestamps
 			NavigableMap<Long, HashMap<String, Queue<Values>>> previous = this.timeWindowsTuples.headMap(tsWindow, false);
@@ -156,7 +157,7 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 			}
 			
 			// Emit all the queued tuples for the new window
-			this.emitTimeWindowTuples(timeWindow);
+			this.emitTimeWindowTuples(currentTimeWindow);
 
 			// Set the new window
 			this.timestampsPerLanguage.put(lang, tsWindow);
