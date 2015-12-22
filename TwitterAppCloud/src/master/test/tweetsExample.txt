@@ -1,0 +1,13 @@
+{"created_at":"Tue Dec 08 17:15:27 +0000 2015","lang":"es","timestamp_ms":"1500000","entities":{"hashtags":[{"text":"casa","indices":[55]}]}}
+{"created_at":"Tue Dec 08 17:15:27 +0000 2015","lang":"es","timestamp_ms":"1600000","entities":{"hashtags":[{"text":"coche","indices":[55]}]}}
+{"created_at":"Tue Dec 08 17:15:27 +0000 2015","lang":"en","timestamp_ms":"1600000","entities":{"hashtags":[{"text":"football","indices":[55]}]}}
+{"created_at":"Tue Dec 08 17:15:27 +0000 2015","lang":"es","timestamp_ms":"1601000","entities":{"hashtags":[{"text":"casa","indices":[55]}]}}
+{"created_at":"Tue Dec 08 17:15:27 +0000 2015","lang":"es","timestamp_ms":"1700000","entities":{"hashtags":[{"text":"casa","indices":[55]}]}}
+{"created_at":"Tue Dec 08 17:15:27 +0000 2015","lang":"en","timestamp_ms":"1751000","entities":{"hashtags":[{"text":"football","indices":[55]}]}}
+{"created_at":"Tue Dec 08 17:15:27 +0000 2015","lang":"en","timestamp_ms":"1752000","entities":{"hashtags":[{"text":"sting","indices":[55]}]}}
+{"created_at":"Tue Dec 08 17:15:27 +0000 2015","lang":"es","timestamp_ms":"1755000","entities":{"hashtags":[{"text":"coche","indices":[55]}]}}
+{"created_at":"Tue Dec 08 17:15:27 +0000 2015","lang":"es","timestamp_ms":"1799000","entities":{"hashtags":[{"text":"casa","indices":[55]}]}}
+{"created_at":"Tue Dec 08 17:15:27 +0000 2015","lang":"es","timestamp_ms":"1799000","entities":{"hashtags":[{"text":"libro","indices":[55]}]}}
+{"created_at":"Tue Dec 08 17:15:27 +0000 2015","lang":"en","timestamp_ms":"1799000","entities":{"hashtags":[{"text":"messi","indices":[55]}]}}
+{"created_at":"Tue Dec 08 17:15:27 +0000 2015","lang":"es","timestamp_ms":"1817000","entities":{"hashtags":[{"text":"work","indices":[55]}]}}
+{"created_at":"Tue Dec 08 17:15:27 +0000 2015","lang":"en","timestamp_ms":"1880000","entities":{"hashtags":[{"text":"what","indices":[55]}]}}

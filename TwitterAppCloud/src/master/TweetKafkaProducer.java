@@ -49,35 +49,9 @@ public class TweetKafkaProducer{
 	public void publishMsg(Tweet tweet){
 		ProducerRecord<String, byte[]> msg;
 		byte[] bytesTweet;
-		//Long ts = this.tweetTimeStamp(tweet.getTimestamp());
-		//if(ts >= currentTs){ // Discard if doesen't belong to current window.
-			//tweet.setTimestamp(ts);
-			bytesTweet = tweetEncoder.toBytes(tweet);
-			msg = new ProducerRecord<String, byte[]>(this.topic, tweet.getLanguage(), bytesTweet);
-			producer.send(msg);
-			//currentTs = ts;
-		//}
-	}
-	
-	/**
-	 * Calculate Tweet's time stamp relative to window logic.
-	 * @param ts
-	 * @return windowTimeStamp
-	 */
-	private Long tweetTimeStamp(Long ts){
-		/*int tsInSec = (int) (ts / 1000);
-		int bucket;
-		if (lowWindowTs < 0){
-			lowWindowTs = tsInSec;
-			topWindowTs = lowWindowTs + SIZE;
-		} else if (tsInSec > topWindowTs){
-			lowWindowTs = topWindowTs + 1;
-			topWindowTs = lowWindowTs + SIZE;
-			window++;
-		}
-		bucket = (tsInSec - lowWindowTs) % SIZE;
-		return (long) window * SIZE + bucket;*/
-		return 0L;
+		bytesTweet = tweetEncoder.toBytes(tweet);
+		msg = new ProducerRecord<String, byte[]>(this.topic, tweet.getLanguage(), bytesTweet);
+		producer.send(msg);
 	}
 	
 	public void close(){

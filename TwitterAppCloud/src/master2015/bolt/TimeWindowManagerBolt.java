@@ -53,7 +53,7 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 
 	@Override
 	public void execute(Tuple input) {
-		
+		System.out.println(input);
 		if(this.isBlankTuple(input)) {
 			processBlankTuple();
 		} else {
@@ -113,13 +113,14 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 			// Send totals for all the different TimeWindows of the old timestamp
 			this.sendAllCountsOfTimestamp(this.window);
 			
+			this.timeWindowsTuples.remove(this.window);
+			
 			// Send tuples from previous timestamps
 			NavigableMap<Long, Queue<Values>> previous = this.timeWindowsTuples.headMap(tsWindow, false);
 			Iterator<Long> timeIt = previous.keySet().iterator();
 			while(timeIt.hasNext()) {
 				
 				Long time = timeIt.next();
-				
 				// Emit all the queued tuples for the new window
 				this.emitTimeWindowTuples(time);
 				
@@ -204,8 +205,7 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 			}
 			
 			// Free memory
-			queue.clear();
-			
+			queue.clear();	
 		}
 	}
 	
