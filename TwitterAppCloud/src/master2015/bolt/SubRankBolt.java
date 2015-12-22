@@ -68,15 +68,17 @@ public class SubRankBolt extends BaseRichBolt {
 	
 	private void emitSubRank(String lang){
 		HashtagRank subRank = this.subRanks.get(lang);
-		TimeWindow tw = this.timeWindows.get(lang);
-		SubRankTupleValues tuple = new SubRankTupleValues(
-				tw,
-				subRank.getBestN(Top3App.RANK_NUMBER),
-				this.totalTweetsProcessed(subRank));
-		System.out.println(tw.getLanguage()+", "+tw.getTimestamp() + ", " + this.totalTweetsProcessed(subRank));
-		System.out.println(tuple);
-		this.collector.emit(Top3App.STREAM_SUBRANK_TO_RANK, tuple);
-		subRank.clear();
+		if(subRank != null){
+			TimeWindow tw = this.timeWindows.get(lang);
+			SubRankTupleValues tuple = new SubRankTupleValues(
+					tw,
+					subRank.getBestN(Top3App.RANK_NUMBER),
+					this.totalTweetsProcessed(subRank));
+			System.out.println(tw.getLanguage()+", "+tw.getTimestamp() + ", " + this.totalTweetsProcessed(subRank));
+			System.out.println(tuple);
+			this.collector.emit(Top3App.STREAM_SUBRANK_TO_RANK, tuple);
+			subRank.clear();
+		}
 	}
 	
 	private int totalTweetsProcessed(HashtagRank subRank){

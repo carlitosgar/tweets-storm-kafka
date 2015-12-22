@@ -37,11 +37,11 @@ public class Top3App {
 	public static final String STREAM_MANAGER_TO_SUBRANK = "managertosubrank";
 	public static final String STREAM_MANAGER_BROADCAST_BLANK = "managerbroadcastblank";
 	
-	public static final int KAFKA_SPOUT_PARALLELISM = 1;
-	public static final int LANG_FILTER_PARALLELISM = 1;
-	public static final int HASHTAG_SPLIT_PARALLELISM = 1;
-	public static final int TIME_MANAGER_PARALLELISM = 1;
-	public static final int SUBRANK_PARALLELISM = 1;
+	public static final int KAFKA_SPOUT_PARALLELISM = 4; // Parallelism <= N_Partitions.
+	public static final int LANG_FILTER_PARALLELISM = 4;
+	public static final int HASHTAG_SPLIT_PARALLELISM = 4;
+	public static final int TIME_MANAGER_PARALLELISM = 4;
+	public static final int SUBRANK_PARALLELISM = 4;
 	public static final int FINAL_RANK_PARALLELISM = 1; 
 	public static final int FILE_LOGER_PARALLELISM = 1; //Should not be greater than the number of languages
 	
@@ -93,11 +93,11 @@ public class Top3App {
 		builder.setSpout(TWEETS_SPOUT,spout.getSpout(),KAFKA_SPOUT_PARALLELISM);		
 		//Language filter.
 		builder.setBolt(LANG_FILTER_BOLT, new LangBolt(languages),LANG_FILTER_PARALLELISM)
-    		.shuffleGrouping(TWEETS_SPOUT);
+    		.fieldsGrouping(TWEETS_SPOUT,new Fields("language"));
 
 		//Hashtag Splitter 
 		builder.setBolt(HASHTAG_SPLIT_BOLT, new HashtagSplitBolt(),HASHTAG_SPLIT_PARALLELISM)
-        	.shuffleGrouping(LANG_FILTER_BOLT);
+        	.fieldsGrouping(LANG_FILTER_BOLT,new Fields("language"));
 
 		//Time manager 
 		builder.setBolt(TIME_MANAGER_BOLT, new TimeWindowManagerBolt(),TIME_MANAGER_PARALLELISM)

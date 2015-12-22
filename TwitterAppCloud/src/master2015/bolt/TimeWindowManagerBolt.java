@@ -59,7 +59,7 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 	public void execute(Tuple input) {
 		System.out.println(input);
 		if(this.isBlankTuple(input)) {
-			processBlankTuple();
+			//processBlankTuple();
 		} else {
 			processHashtagTuple(input);
 		}
@@ -139,6 +139,10 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 			while(timeIt.hasNext()) {
 				
 				Long time = timeIt.next();
+				
+				if(this.timeWindowsTuples.get(time).get(lang) == null)
+					continue;
+				
 				TimeWindow tw = new TimeWindow(lang, time);
 				
 				// Emit all the queued tuples for the new window
@@ -157,7 +161,7 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 			}
 			
 			// Emit all the queued tuples for the new window
-			this.emitTimeWindowTuples(currentTimeWindow);
+			this.emitTimeWindowTuples(new TimeWindow(lang, tsWindow));
 
 			// Set the new window
 			this.timestampsPerLanguage.put(lang, tsWindow);
