@@ -35,7 +35,9 @@ public class Top3App {
 	public static final String STREAM_RANK_TO_LOGERS = "ranktologers";
 	public static final String STREAM_MANAGER_TO_RANK = "managertorank";
 	public static final String STREAM_MANAGER_TO_SUBRANK = "managertosubrank";
+	public static final String STREAM_MANAGER_BROADCAST_BLANK = "managerbroadcastblank";
 	
+	public static final int KAFKA_SPOUT_PARALLELISM = 1;
 	public static final int LANG_FILTER_PARALLELISM = 1;
 	public static final int HASHTAG_SPLIT_PARALLELISM = 1;
 	public static final int TIME_MANAGER_PARALLELISM = 1;
@@ -88,8 +90,7 @@ public class Top3App {
 		TopologyBuilder builder = new TopologyBuilder();
 		
 		//Kafka tweet's consumer.
-		builder.setSpout(TWEETS_SPOUT,spout.getSpout());
-		
+		builder.setSpout(TWEETS_SPOUT,spout.getSpout(),KAFKA_SPOUT_PARALLELISM);		
 		//Language filter.
 		builder.setBolt(LANG_FILTER_BOLT, new LangBolt(languages),LANG_FILTER_PARALLELISM)
     		.shuffleGrouping(TWEETS_SPOUT);
@@ -104,7 +105,8 @@ public class Top3App {
 		
 		//Subrank
 		builder.setBolt(SUBRANK_BOLT, new SubRankBolt(),SUBRANK_PARALLELISM)
-			.fieldsGrouping(TIME_MANAGER_BOLT, STREAM_MANAGER_TO_SUBRANK, new Fields("language","hashtag"));
+			.fieldsGrouping(TIME_MANAGER_BOLT, STREAM_MANAGER_TO_SUBRANK, new Fields("language","hashtag"))
+			.allGrouping(TIME_MANAGER_BOLT, STREAM_MANAGER_BROADCAST_BLANK);
 
 		//Final Rank
 		builder.setBolt(FINAL_RANK_BOLT, new FinalRankBolt(),FINAL_RANK_PARALLELISM)
