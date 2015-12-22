@@ -185,14 +185,16 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 	
 	private void removeTuplesOfTimeWindow(TimeWindow tw, Iterator it) {
 		HashMap<String, Queue<Values>> twtuples = this.timeWindowsTuples.get(tw.getTimestamp());
-		twtuples.remove(tw.getLanguage());
-		if(twtuples.size() == 0) {
-			if(it != null) {
-				it.remove();
-			} else {
-				this.timeWindowsTuples.remove(tw.getTimestamp());
+		if (twtuples != null){
+			twtuples.remove(tw.getLanguage());
+			if(twtuples.size() == 0) {
+				if(it != null) {
+					it.remove();
+				} else {
+					this.timeWindowsTuples.remove(tw.getTimestamp());
+				}
+				
 			}
-			
 		}
 	}
 	
@@ -213,10 +215,12 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 		this.sendTimeWindowCount(timeWindow);
 		
 		Set<TimeWindow> setTimeWindows = this.uniqueTimeWindows.get(timestamp);
-		setTimeWindows.remove(timeWindow);
+		if(setTimeWindows != null){
+			setTimeWindows.remove(timeWindow);
 		
-		if(setTimeWindows.size() == 0) {
-			this.uniqueTimeWindows.remove(timestamp);
+			if(setTimeWindows.size() == 0) {
+				this.uniqueTimeWindows.remove(timestamp);
+			}
 		}
 		
 	}
