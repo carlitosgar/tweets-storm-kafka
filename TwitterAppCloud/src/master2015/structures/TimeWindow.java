@@ -20,6 +20,14 @@ public class TimeWindow implements Comparable<TimeWindow> {
 		TimeWindow.advance = advance;
 	}
 	
+	public static int getSize(){
+		return size;
+	}
+	
+	public static int getAdvance(){
+		return advance;
+	}
+	
 	public static TimeWindow getTimeWindow(String language, Long timestamp){
 		Long currentTs = timestamp / 1000L;
 		Long window = (long) TimeWindow.size;

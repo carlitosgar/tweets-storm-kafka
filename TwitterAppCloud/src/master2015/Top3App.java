@@ -12,7 +12,6 @@ import master2015.bolt.FileLogBolt;
 import master2015.bolt.FinalRankBolt;
 import master2015.bolt.HashtagSplitBolt;
 import master2015.bolt.LangBolt;
-import master2015.bolt.LogBolt;
 import master2015.bolt.SubRankBolt;
 import master2015.bolt.TimeWindowManagerBolt;
 import master2015.spout.TweetKafkaSpout;
@@ -39,6 +38,7 @@ public class Top3App {
 	
 	public static final int LANG_FILTER_PARALLELISM = 1;
 	public static final int HASHTAG_SPLIT_PARALLELISM = 1;
+	public static final int TIME_MANAGER_PARALLELISM = 1;
 	public static final int SUBRANK_PARALLELISM = 1;
 	public static final int FINAL_RANK_PARALLELISM = 1; 
 	public static final int FILE_LOGER_PARALLELISM = 1; //Should not be greater than the number of languages
@@ -99,11 +99,11 @@ public class Top3App {
         	.shuffleGrouping(LANG_FILTER_BOLT);
 
 		//Time manager 
-		builder.setBolt(TIME_MANAGER_BOLT, new TimeWindowManagerBolt())
+		builder.setBolt(TIME_MANAGER_BOLT, new TimeWindowManagerBolt(),TIME_MANAGER_PARALLELISM)
         	.fieldsGrouping(HASHTAG_SPLIT_BOLT, new Fields("language"));
 		
 		//Subrank
-		builder.setBolt(SUBRANK_BOLT, new SubRankBolt())
+		builder.setBolt(SUBRANK_BOLT, new SubRankBolt(),SUBRANK_PARALLELISM)
 			.fieldsGrouping(TIME_MANAGER_BOLT, STREAM_MANAGER_TO_SUBRANK, new Fields("language","hashtag"));
 
 		//Final Rank
@@ -114,10 +114,6 @@ public class Top3App {
 		//File loger
 		builder.setBolt(FILE_LOGER_BOLT, new FileLogBolt(), FILE_LOGER_PARALLELISM)
 			.fieldsGrouping(FINAL_RANK_BOLT, STREAM_RANK_TO_LOGERS, new Fields(RankTupleValues.FIELD_LANGUAGE));
-				
-		//Printer.
-		/*builder.setBolt("printer", new LogBolt())
-			.shuffleGrouping(SUBRANK_BOLT);*/
 
 		//Config topology.
 		Config conf = new Config();

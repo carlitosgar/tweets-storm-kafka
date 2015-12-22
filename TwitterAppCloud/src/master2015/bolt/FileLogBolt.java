@@ -14,6 +14,7 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 import master2015.Top3App;
 import master2015.structures.HashtagRankEntry;
+import master2015.structures.TimeWindow;
 import master2015.structures.tuple.RankTupleValues;
 
 public class FileLogBolt extends BaseRichBolt {
@@ -69,8 +70,9 @@ public class FileLogBolt extends BaseRichBolt {
 	 * @return
 	 */
 	private String getLogTextFromTuple(RankTupleValues tupleVals) {
-		String s = tupleVals.getTimeWindow().getTimestamp() * 1000
-				+ "," + tupleVals.getTimeWindow().getLanguage();
+		Long windowID = tupleVals.getTimeWindow().getTimestamp() * 1000 
+				- TimeWindow.getSize() + TimeWindow.getAdvance();
+		String s = windowID + "," + tupleVals.getTimeWindow().getLanguage();
 		
 		List<HashtagRankEntry> rank = tupleVals.getRank();
 		
