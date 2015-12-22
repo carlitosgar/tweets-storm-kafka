@@ -72,7 +72,7 @@ public class Top3App {
 		String topologyName = args[3];
 		
 		//Set the log path
-		LOG_PATH = (args[4].endsWith(File.separator) ? args[4] : File.separator + args[4]);
+		LOG_PATH = (args[4].endsWith(File.separator) ? args[4] : args[4] + File.separator);
 		File path = new File(LOG_PATH);
 		if(!path.exists() || !path.isDirectory() || !path.canWrite()) {
 			System.err.println("Log directory is not writable");

@@ -25,18 +25,11 @@ public class TweetKafkaProducer{
 	
 	public TweetKafkaProducer (String topic, String kafkaUrl){
 		this.topic = topic;
-		try {
-			
-			//Load configuration from file
-			InputStream in = new FileInputStream("src/master/producer.properties");
-			this.props.load(in);
-			
-			//Kafka url
-			this.props.put("bootstrap.servers", kafkaUrl);
-			
-		} catch(IOException e){
-			System.out.println(e.toString());
-		}
+		
+		this.props.put("bootstrap.servers", kafkaUrl);
+		this.props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+		this.props.put("value.serializer", "org.apache.kafka.common.serialization.ByteArraySerializer");
+		this.props.put("request.required.acks", "1");
 		
 		producer = new KafkaProducer<String, byte[]>(props);
 	}
