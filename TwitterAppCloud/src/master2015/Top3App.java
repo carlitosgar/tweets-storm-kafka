@@ -129,9 +129,9 @@ public class Top3App {
 	    System.out.println(" Done!");
 	    
 	    //Set topology life-cycle.
-	    Thread.sleep((long) 15000);
-	    cluster.killTopology(topologyName);
-	    cluster.shutdown();
+	    //Thread.sleep((long)10000);
+	    //cluster.killTopology(topologyName);
+	    //cluster.shutdown();
 	}
 
 }

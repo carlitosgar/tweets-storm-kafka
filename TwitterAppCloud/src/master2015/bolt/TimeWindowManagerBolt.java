@@ -1,6 +1,5 @@
 package master2015.bolt;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -75,6 +74,8 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 		// Send the count of the current window
 		this.sendAllCountsOfTimestamp(this.window);
 		
+		this.timeWindowsTuples.remove(this.window);
+		
 		//Send all pending tuples and count per each timestamp of the next windows that are still queued
 		Iterator<Long> timeIt = this.timeWindowsTuples.keySet().iterator();
 		while(timeIt.hasNext()) {
@@ -105,7 +106,7 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 		if (this.isFirstWindow()){ // First tuple
 			this.window = tsWindow;
 			
-		} else if (!this.isSameWindow(tsWindow)){ // Change of time window
+		} else if (this.window<tsWindow){// Change of time window
 						
 			//Send blank tuples for all the languages of the old timestamp
 			this.sendBlankTuplesForTimestamp(this.window);
@@ -154,7 +155,7 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 			if (this.isSameWindow(tsWindow)){
 				System.out.println("Emit!!! : " + tuple + ", " + tsWindow);
 				this.collector.emit(Top3App.STREAM_MANAGER_TO_SUBRANK, tuple);
-			} else {
+			} else if(this.window < tsWindow) {
 				this.keepFutureTuple(tsWindow, lang, tuple);
 			}
 		}
