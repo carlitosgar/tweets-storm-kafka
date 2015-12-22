@@ -182,6 +182,7 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 	}
 	
 	private void sendBlankTuplesForTimestamp(Long timestamp) {
+		//TODO: Send only for the lang that changed.
 		for(TimeWindow timeWindow: this.uniqueTimeWindows.get(timestamp)) {
 			System.out.println("Emit Blank!!! : " + timeWindow );
 			this.emitBlankTuple(timeWindow);
@@ -189,7 +190,9 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 	}
 	
 	private void emitBlankTuple(TimeWindow timeWindow) {
-		this.collector.emit(Top3App.STREAM_MANAGER_TO_SUBRANK,new Values(timeWindow.getLanguage(),null,timeWindow));
+		//TODO: boradcast blank tuple for lang to all subRank tasks when parallelism!
+		this.collector.emit(Top3App.STREAM_MANAGER_BROADCAST_BLANK,new Values(timeWindow.getLanguage(),null,timeWindow));
+		//this.collector.emit(Top3App.STREAM_MANAGER_TO_SUBRANK,new Values(timeWindow.getLanguage(),null,timeWindow));
 	}
 	
 	/**
@@ -260,6 +263,7 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declareStream(Top3App.STREAM_MANAGER_TO_RANK, new Fields("timewindow","count"));
 		declarer.declareStream(Top3App.STREAM_MANAGER_TO_SUBRANK, new Fields("language","hashtag","timewindow"));
+		declarer.declareStream(Top3App.STREAM_MANAGER_BROADCAST_BLANK, new Fields("language","hashtag","timewindow"));
 	}
 
 }
