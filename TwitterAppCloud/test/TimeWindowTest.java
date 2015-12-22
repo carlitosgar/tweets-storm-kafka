@@ -1,4 +1,4 @@
-package master2015.tests;
+
 
 import static org.junit.Assert.*;
 
