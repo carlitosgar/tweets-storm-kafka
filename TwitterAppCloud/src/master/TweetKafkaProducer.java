@@ -11,15 +11,8 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 
 public class TweetKafkaProducer{
 	
-	/*private static final int SIZE = 500; //Hardcoded size for testing.
-	private static final int ADVANCE = 3; //Hardcoded advance for testing.*/
-	
 	private final String topic;
 	private final Properties props = new Properties();
-	/*private static int window = 0;
-	private static int lowWindowTs = -1;
-	private static int topWindowTs = -1;
-	private static Long currentTs = 0L;*/
 	private static Encoder<Tweet> tweetEncoder = new TweetEncoder(null);
 	private static KafkaProducer<String, byte[]> producer;
 	
@@ -33,6 +26,7 @@ public class TweetKafkaProducer{
 			
 			//Kafka url
 			this.props.put("bootstrap.servers", kafkaUrl);
+			this.props.put("partitioner.class", "master.LangPartitioner");
 			
 		} catch(IOException e){
 			System.out.println(e.toString());
