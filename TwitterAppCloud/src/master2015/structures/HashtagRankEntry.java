@@ -1,5 +1,7 @@
 package master2015.structures;
 
+import java.text.Collator;
+
 public class HashtagRankEntry implements Comparable<HashtagRankEntry>{
 	
 	public String language;
@@ -21,7 +23,8 @@ public class HashtagRankEntry implements Comparable<HashtagRankEntry>{
 		if(this.count != o.count) {
 			return o.count - this.count;
 		} else {
-			return this.hashtag.compareTo(o.hashtag);
+			Collator comp = Collator.getInstance();
+			return comp.compare(this.hashtag, o.hashtag);
 		}
 	}
 	

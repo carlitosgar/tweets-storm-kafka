@@ -6,6 +6,10 @@ import java.util.List;
 
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
+import backtype.storm.StormSubmitter;
+import backtype.storm.generated.AlreadyAliveException;
+import backtype.storm.generated.AuthorizationException;
+import backtype.storm.generated.InvalidTopologyException;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
 import master2015.bolt.FileLogBolt;
@@ -120,11 +124,22 @@ public class Top3App {
 		//Config topology.
 		Config conf = new Config();
 		conf.setNumAckers(0);
-		LocalCluster cluster = new LocalCluster();
+		conf.setNumWorkers(2);
 		
+		System.out.print("Sending topology...");
+		try {
+			StormSubmitter.submitTopology(topologyName, conf, builder.createTopology());
+			System.out.println(" Done!");
+		} catch (AlreadyAliveException | InvalidTopologyException | AuthorizationException e) {
+			e.printStackTrace();
+		}
+	    
+		/*
+		LocalCluster cluster = new LocalCluster();
 		System.out.print("Sending topology...");
 	    cluster.submitTopology(topologyName, conf, builder.createTopology());
 	    System.out.println(" Done!");
+	    */
 	    
 	    //Set topology life-cycle.
 	    //Thread.sleep((long)10000);
