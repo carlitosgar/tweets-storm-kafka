@@ -1,18 +1,17 @@
 package master2015.bolt;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.topology.base.BaseBasicBolt;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 
-public class LangBolt extends BaseRichBolt{
+public class LangBolt extends BaseRichBolt implements Serializable{
 	
 	private static final long serialVersionUID = 9129598163544824838L;
 	

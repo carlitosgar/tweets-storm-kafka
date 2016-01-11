@@ -48,8 +48,6 @@ public class Top3App {
 	public static final int SUBRANK_PARALLELISM = 4;
 	public static final int FINAL_RANK_PARALLELISM = 1; 
 	public static final int FILE_LOGER_PARALLELISM = 1; //Should not be greater than the number of languages
-	
-	public static String LOG_PATH = "";
 
 	public Top3App() {
 		// TODO Auto-generated constructor stub
@@ -78,8 +76,8 @@ public class Top3App {
 		String topologyName = args[3];
 		
 		//Set the log path
-		LOG_PATH = (args[4].endsWith(File.separator) ? args[4] : args[4] + File.separator);
-		File path = new File(LOG_PATH);
+		String logPath = (args[4].endsWith(File.separator) ? args[4] : args[4] + File.separator);
+		File path = new File(logPath);
 		if(!path.exists() || !path.isDirectory() || !path.canWrite()) {
 			System.err.println("Log directory is not writable");
 			return;
@@ -118,7 +116,7 @@ public class Top3App {
 			.globalGrouping(TIME_MANAGER_BOLT, STREAM_MANAGER_TO_RANK);
 		
 		//File loger
-		builder.setBolt(FILE_LOGER_BOLT, new FileLogBolt(), FILE_LOGER_PARALLELISM)
+		builder.setBolt(FILE_LOGER_BOLT, new FileLogBolt(logPath), FILE_LOGER_PARALLELISM)
 			.fieldsGrouping(FINAL_RANK_BOLT, STREAM_RANK_TO_LOGERS, new Fields(RankTupleValues.FIELD_LANGUAGE));
 
 		//Config topology.

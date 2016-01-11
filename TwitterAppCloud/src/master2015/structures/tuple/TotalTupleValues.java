@@ -1,5 +1,7 @@
 package master2015.structures.tuple;
 
+import java.util.List;
+
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
@@ -22,8 +24,9 @@ public class TotalTupleValues extends Values {
 	 * @return The object. Null if the tuple does not contain an object of this class.
 	 */
 	public static TotalTupleValues fromTuple(Tuple tuple) {
-		if(tuple.getValues() instanceof TotalTupleValues) {
-			return (TotalTupleValues) tuple.getValues();
+		if(tuple != null && tuple.getValues() != null && tuple.getValues().size() == 2) {
+			List<Object> l = tuple.getValues();
+			return new TotalTupleValues((TimeWindow)l.get(0), (Integer)l.get(1));
 		} else {
 			return null;
 		}

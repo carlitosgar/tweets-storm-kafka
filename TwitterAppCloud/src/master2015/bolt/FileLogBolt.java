@@ -20,16 +20,19 @@ import master2015.structures.tuple.RankTupleValues;
 public class FileLogBolt extends BaseRichBolt {
 	
 	private static final long serialVersionUID = -8612023062638735516L;
-	HashMap<String, PrintWriter> writers = new HashMap<String, PrintWriter>();
+	private HashMap<String, PrintWriter> writers;
+	private String path;
 	
 
-	public FileLogBolt() {
+	public FileLogBolt(String path) {
 		super();
+		this.path = path;
 	}
 
 	@Override
 	@SuppressWarnings("rawtypes")
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
+		this.writers = new HashMap<String, PrintWriter>();
 		return;
 	}
 
@@ -46,7 +49,7 @@ public class FileLogBolt extends BaseRichBolt {
 			
 			if(writer == null) {
 				try {
-					writer = new PrintWriter(Top3App.LOG_PATH + lang +"_02.log", "UTF-8");
+					writer = new PrintWriter(this.path + lang +"_02.log", "UTF-8");
 				} catch (FileNotFoundException | UnsupportedEncodingException e) {
 					e.printStackTrace();
 					return;

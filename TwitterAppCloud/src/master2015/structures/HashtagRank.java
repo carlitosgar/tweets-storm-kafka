@@ -1,12 +1,14 @@
 package master2015.structures;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-public class HashtagRank {
+public class HashtagRank implements Serializable{
 	
+	private static final long serialVersionUID = 1103609228922852174L;
 	private HashMap<String, HashtagRankEntry> hashMap;
 
 	public HashtagRank() {
@@ -35,12 +37,16 @@ public class HashtagRank {
 	public List<HashtagRankEntry> getBestN(int n) {
 		
 		List<HashtagRankEntry> entries = new LinkedList<HashtagRankEntry>(this.hashMap.values());
-		
+		List<HashtagRankEntry> ret = new LinkedList<HashtagRankEntry>();
 		// Sort the entries
 		Collections.sort(entries);
 		
 		// Return the top n elements
-		return entries.subList(0, (n < this.size() ? n : this.size()));
+		for(HashtagRankEntry ent : entries.subList(0, (n < this.size() ? n : this.size()))) {
+			ret.add(ent);
+		}
+		
+		return ret;
 		
 	}
 	

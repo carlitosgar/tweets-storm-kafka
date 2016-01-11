@@ -28,8 +28,9 @@ public class SubRankTupleValues extends Values {
 	 * @return The object. Null if the tuple does not contain a SubRankTupleValues object.
 	 */
 	public static SubRankTupleValues fromTuple(Tuple tuple) {
-		if(tuple.getValues() instanceof SubRankTupleValues) {
-			return (SubRankTupleValues) tuple.getValues();
+		if(tuple != null && tuple.getValues() != null && tuple.getValues().size() == 3) {
+			List<Object> l = tuple.getValues();
+			return new SubRankTupleValues((TimeWindow)l.get(0), (List<HashtagRankEntry>)l.get(1), (int)l.get(2));
 		} else {
 			return null;
 		}

@@ -3,8 +3,6 @@ package master2015.bolt;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -28,19 +26,19 @@ public class FinalRankBolt extends BaseRichBolt {
 	/**
 	 * HashMap that contains timeWindows as keys, and the total of tweets in that time window as values.
 	 */
-	private HashMap<TimeWindow, Integer> totals = new HashMap<TimeWindow, Integer>();
+	private HashMap<TimeWindow, Integer> totals;
 	
 	/**
 	 * HashMap that contains timeWindows as keys, and the current count of received tweets in 
 	 * that time window.
 	 */
-	private HashMap<TimeWindow, Integer> counts = new HashMap<TimeWindow, Integer>();
+	private HashMap<TimeWindow, Integer> counts;
 	
 	/**
 	 * HashMap that contains all the ranks that are pending to be logged because not all the SubRanks have
 	 * been received
 	 */
-	private HashMap<TimeWindow, HashtagRank> pendingRanks = new HashMap<TimeWindow, HashtagRank>();
+	private HashMap<TimeWindow, HashtagRank> pendingRanks;
 	
 
 	public FinalRankBolt() {
@@ -155,6 +153,9 @@ public class FinalRankBolt extends BaseRichBolt {
 	@SuppressWarnings("rawtypes")
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
 		this.collector = collector;
+		this.totals = new HashMap<TimeWindow, Integer>();
+		this.counts = new HashMap<TimeWindow, Integer>();
+		this.pendingRanks = new HashMap<TimeWindow, HashtagRank>();
 
 	}
 

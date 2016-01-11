@@ -1,9 +1,11 @@
 package master2015.structures;
 
+import java.io.Serializable;
 import java.text.Collator;
 
-public class HashtagRankEntry implements Comparable<HashtagRankEntry>{
+public class HashtagRankEntry implements Comparable<HashtagRankEntry>, Serializable{
 	
+	private static final long serialVersionUID = -2124589431097288411L;
 	public String language;
 	public String hashtag;
 	public int count;

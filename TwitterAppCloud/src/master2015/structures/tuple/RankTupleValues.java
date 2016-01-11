@@ -31,8 +31,10 @@ public class RankTupleValues extends Values {
 	 * @return The object. Null if the tuple does not contain a RankTupleValues object.
 	 */
 	public static RankTupleValues fromTuple(Tuple tuple) {
-		if(tuple.getValues() instanceof RankTupleValues) {
-			return (RankTupleValues) tuple.getValues();
+		System.out.println("El print del asco:" + tuple.getValues());
+		if(tuple != null && tuple.getValues() != null && tuple.getValues().size() == 3) {
+			List<Object> l = tuple.getValues();
+			return new RankTupleValues((TimeWindow)l.get(0), (List<HashtagRankEntry>)l.get(1));
 		} else {
 			return null;
 		}

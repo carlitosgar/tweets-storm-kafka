@@ -1,9 +1,12 @@
 package master2015.structures;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TimeWindow implements Comparable<TimeWindow> {
+public class TimeWindow implements Comparable<TimeWindow>, Serializable {
+
+	private static final long serialVersionUID = 7640542374945891392L;
 
 	private static int size;
 	private static int advance;
@@ -57,6 +60,7 @@ public class TimeWindow implements Comparable<TimeWindow> {
 		if(timestamp < TimeWindow.size) {
 			return (long) TimeWindow.size; //First window
 		} else {
+			System.out.println("Antes de el modulo con " + TimeWindow.advance);
 			Long lowerMultiple = timestamp - (timestamp % TimeWindow.advance);
 			int dif = TimeWindow.size - TimeWindow.advance;
 			

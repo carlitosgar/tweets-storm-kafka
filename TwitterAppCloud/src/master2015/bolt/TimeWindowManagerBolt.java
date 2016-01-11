@@ -1,5 +1,6 @@
 package master2015.bolt;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -23,10 +24,10 @@ import master2015.Top3App;
 import master2015.structures.TimeWindow;
 import master2015.structures.tuple.TotalTupleValues;
 
-public class TimeWindowManagerBolt extends BaseRichBolt{
+public class TimeWindowManagerBolt extends BaseRichBolt implements Serializable{
 
 	private static final long serialVersionUID = -1078494623581520582L;
-	private TreeMap<Long, HashMap<String, Queue<Values>>> timeWindowsTuples;
+	private TreeMap<Long, HashMap<String, Queue<Values>>> timeWindowsTuples = new TreeMap<Long, HashMap<String, Queue<Values>>>();
 	
 	/**
 	 * This hashmap contains the list of unique TimeWindows received per window timestamp
@@ -50,7 +51,6 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 	public TimeWindowManagerBolt(int size, int advance){
 		this.size = size;
 		this.advance = advance;
-		this.timeWindowsTuples = new TreeMap<Long, HashMap<String, Queue<Values>>>();
 	}
 	
 	@SuppressWarnings("rawtypes")
