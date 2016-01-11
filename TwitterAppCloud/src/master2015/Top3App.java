@@ -87,7 +87,6 @@ public class Top3App {
 		
 		//Config time window.
 		String[] twParams = args[2].split(",");
-		TimeWindow.configTimeWindow(Integer.parseInt(twParams[0]), Integer.parseInt(twParams[1]));
 
 		//Build topology.
 		TweetKafkaSpout spout = new TweetKafkaSpout("twitterStream", args[1]);
@@ -104,7 +103,8 @@ public class Top3App {
         	.fieldsGrouping(LANG_FILTER_BOLT,new Fields("language"));
 
 		//Time manager 
-		builder.setBolt(TIME_MANAGER_BOLT, new TimeWindowManagerBolt(),TIME_MANAGER_PARALLELISM)
+		builder.setBolt(TIME_MANAGER_BOLT, new TimeWindowManagerBolt(Integer.parseInt(twParams[0])
+				,Integer.parseInt(twParams[1])),TIME_MANAGER_PARALLELISM)
         	.fieldsGrouping(HASHTAG_SPLIT_BOLT, new Fields("language"));
 		
 		//Subrank
@@ -137,7 +137,7 @@ public class Top3App {
 		/*
 		LocalCluster cluster = new LocalCluster();
 		System.out.print("Sending topology...");
-	    cluster.submitTopology(topologyName, conf, builder.createTopology());
+		cluster.submitTopology(topologyName, conf, builder.createTopology());
 	    System.out.println(" Done!");
 	    */
 	    

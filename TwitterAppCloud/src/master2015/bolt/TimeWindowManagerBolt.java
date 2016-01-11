@@ -42,16 +42,21 @@ public class TimeWindowManagerBolt extends BaseRichBolt{
 	 * 
 	 */
 	private HashMap<String, Long> timestampsPerLanguage = new HashMap<String, Long>();
+	private int advance;
+	private int size;
 	
 	private OutputCollector collector;
 	
-	public TimeWindowManagerBolt(){
+	public TimeWindowManagerBolt(int size, int advance){
+		this.size = size;
+		this.advance = advance;
 		this.timeWindowsTuples = new TreeMap<Long, HashMap<String, Queue<Values>>>();
 	}
 	
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
+		TimeWindow.configTimeWindow(this.size, this.advance);
 		this.collector = collector;	
 	}
 
